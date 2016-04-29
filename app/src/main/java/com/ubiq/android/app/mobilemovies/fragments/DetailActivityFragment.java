@@ -81,103 +81,108 @@ public class DetailActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.movie_detail, container, false);
-        initializeViews(rootView);
+        try {
+            View rootView = inflater.inflate(R.layout.movie_detail, container, false);
+            initializeViews(rootView);
 
-        Bundle arguments = getArguments();
-        if (arguments != null) {
+            Bundle arguments = getArguments();
+            if (arguments != null) {
 
-            mMoviePosition = arguments.getInt(Utils.MOVIE_KEY);
-            // Log.v(LOG_TAG, "**onCreateView position = " + String.valueOf(moviePosition));
+                mMoviePosition = arguments.getInt(Utils.MOVIE_KEY);
+                // Log.v(LOG_TAG, "**onCreateView position = " + String.valueOf(moviePosition));
 
-            mMovie = PopularMovies.getInstance().getMovie(mMoviePosition);
-            // Log.v(LOG_TAG, "movie[" + String.valueOf(moviePosition) + "] = " + mMovie.toString());
+                mMovie = PopularMovies.getInstance().getMovie(mMoviePosition);
+                // Log.v(LOG_TAG, "movie[" + String.valueOf(moviePosition) + "] = " + mMovie.toString());
 
-            //** Initialize the detailed movie view
-            //    set the movie title banner
-            mMovieTitleLargeTextView.setText(mMovie.getTitle());
-            //    set the release year
-            mMovieYearTextView.setText(mMovie.getReleaseYear());
-            //    set the running time (if available); if not, set in FetchMovieDetail.onPostExecute
-            mRunningTimeTextView.setText(String.valueOf(mMovie.getRunningTime()) + " min");
-            //    set the movie movie_rating
-            mMovieRatingTextView.setText(mMovie.getRating() + "/" + Utils.MAXIMUM_MOVIE_RATING);
-            //    set the (short) description
-            mMovieDescriptionTextView.setText(mMovie.getOverview());
+                //** Initialize the detailed movie view
+                //    set the movie title banner
+                mMovieTitleLargeTextView.setText(mMovie.getTitle());
+                //    set the release year
+                mMovieYearTextView.setText(mMovie.getReleaseYear());
+                //    set the running time (if available); if not, set in FetchMovieDetail.onPostExecute
+                mRunningTimeTextView.setText(String.valueOf(mMovie.getRunningTime()) + " min");
+                //    set the movie movie_rating
+                mMovieRatingTextView.setText(mMovie.getRating() + "/" + Utils.MAXIMUM_MOVIE_RATING);
+                //    set the (short) description
+                mMovieDescriptionTextView.setText(mMovie.getOverview());
 
-            // fill in the thumbnail picture of the movie poster
-            try {
-                URL url = Utils.buildMovieImageURL(mMovie.getPosterPath());
-                Log.v(LOG_TAG, "Movie poster url " + url);
-                //Load the image from the URL into imageView
-                Picasso.with(getContext())
-                        .load(url.toString())
-                        .resize(Utils.IMAGE_SIZE_WIDTH, Utils.IMAGE_SIZE_HEIGHT)
-                        .into(mMoviePosterImageView);
-            }
-            catch (MalformedURLException e) {
-                Log.e(LOG_TAG, e.toString());
-            }
-
-            //   create the favorite button
-            mFavoriteButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    final String movieTitle = mMovie.getTitle();
-                    long result = addToFavorites(mMovie);
-                   // Log.v(LOG_TAG, "***adding favorite result " + String.valueOf(result));
-                    String toastString = "Whoops! Nothing happened";
-                    if (result > 0) {
-                        toastString = movieTitle + " Added to Favorites!";
-
-                    }
-                    else if (result == MovieOToRMapper.MOVIE_IN_FAVORITES) {
-                        toastString = movieTitle + " Already in Favorites";
-                    }
-                    else {
-                        toastString = movieTitle + " Couldn't be added to Favorites";
-                    }
-                    Toast toast = Toast.makeText(getActivity(),
-                                                 toastString,
-                                                 Toast.LENGTH_SHORT);
-                    toast.show();
+                // fill in the thumbnail picture of the movie poster
+                try {
+                    URL url = Utils.buildMovieImageURL(mMovie.getPosterPath());
+                    Log.v(LOG_TAG, "Movie poster url " + url);
+                    //Load the image from the URL into imageView
+                    Picasso.with(getContext())
+                            .load(url.toString())
+                            .resize(Utils.IMAGE_SIZE_WIDTH, Utils.IMAGE_SIZE_HEIGHT)
+                            .into(mMoviePosterImageView);
                 }
-            });
+                catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, e.toString());
+                }
 
-            mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                  @Override
-                  public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                      if(isChecked){
-                          Log.v(LOG_TAG, "Switch is currently ON");
-                          Fragment reviewsFragment = new MovieReviewsFragment();
-                          switchFragment(reviewsFragment, REVIEW_FRAMENT_TAG,TRAILER_FRAGMENT_TAG);
-                      }else{
-                          Log.v(LOG_TAG, "Switch is currently OFF");
-                          Fragment trailersFragment = new MovieTrailersFragment();
-                          switchFragment(trailersFragment, TRAILER_FRAGMENT_TAG,REVIEW_FRAMENT_TAG);
+                //   create the favorite button
+                mFavoriteButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        final String movieTitle = mMovie.getTitle();
+                        long result = addToFavorites(mMovie);
+                       // Log.v(LOG_TAG, "***adding favorite result " + String.valueOf(result));
+                        String toastString = "Whoops! Nothing happened";
+                        if (result > 0) {
+                            toastString = movieTitle + " Added to Favorites!";
 
-                      }
-                   }
+                        }
+                        else if (result == MovieOToRMapper.MOVIE_IN_FAVORITES) {
+                            toastString = movieTitle + " Already in Favorites";
+                        }
+                        else {
+                            toastString = movieTitle + " Couldn't be added to Favorites";
+                        }
+                        Toast toast = Toast.makeText(getActivity(),
+                                                     toastString,
+                                                     Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                });
+
+                mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                      @Override
+                      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                          if(isChecked){
+                              Log.v(LOG_TAG, "Switch is currently ON");
+                              Fragment reviewsFragment = new MovieReviewsFragment();
+                              switchFragment(reviewsFragment, REVIEW_FRAMENT_TAG,TRAILER_FRAGMENT_TAG);
+                          }else{
+                              Log.v(LOG_TAG, "Switch is currently OFF");
+                              Fragment trailersFragment = new MovieTrailersFragment();
+                              switchFragment(trailersFragment, TRAILER_FRAGMENT_TAG,REVIEW_FRAMENT_TAG);
+
+                          }
+                       }
+                }
+                );
+
+                //     bind mMovieTrailerAdapter with empty trailers for now
+                ArrayList < MovieTrailer > movieTrailers = new ArrayList<MovieTrailer>();
+    //          alternate implementation
+    //            mMovieTrailerAdapter   = new MovieTrailerAdapter(movieTrailers);
+                mMovieTrailerAdapter   = new
+                        com.ubiq.android.app.mobilemovies.utils.MovieTrailerAdapter(movieTrailers, getActivity());
+                //     bind mMovieTrailerAdapter with empty trailers for now
+                ArrayList<MovieReview> movieReviews = new ArrayList<MovieReview>();
+                mMovieReviewAdapter  = new MovieReviewsAdapter(movieReviews, getActivity());
+
+    //            Intent intent = getActivity().getIntent();
+    //            intent.putExtra (Utils.MOVIE_KEY, mMoviePosition);
+
+                updateMovieDetail();
+
+                switchFragment (new MovieTrailersFragment(),TRAILER_FRAGMENT_TAG,REVIEW_FRAMENT_TAG);
             }
-            );
-
-            //     bind mMovieTrailerAdapter with empty trailers for now
-            ArrayList < MovieTrailer > movieTrailers = new ArrayList<MovieTrailer>();
-//          alternate implementation
-//            mMovieTrailerAdapter   = new MovieTrailerAdapter(movieTrailers);
-            mMovieTrailerAdapter   = new
-                    com.ubiq.android.app.mobilemovies.utils.MovieTrailerAdapter(movieTrailers, getActivity());
-            //     bind mMovieTrailerAdapter with empty trailers for now
-            ArrayList<MovieReview> movieReviews = new ArrayList<MovieReview>();
-            mMovieReviewAdapter  = new MovieReviewsAdapter(movieReviews, getActivity());
-
-//            Intent intent = getActivity().getIntent();
-//            intent.putExtra (Utils.MOVIE_KEY, mMoviePosition);
-
-            updateMovieDetail();
-
-            switchFragment (new MovieTrailersFragment(),TRAILER_FRAGMENT_TAG,REVIEW_FRAMENT_TAG);
+            return rootView;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return rootView;
+        return null;
     }
 
     @Override
