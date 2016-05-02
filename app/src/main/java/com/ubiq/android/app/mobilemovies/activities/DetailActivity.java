@@ -17,7 +17,7 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.container_movie_detail);
+        setContentView(R.layout.movie_detail_container);
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
@@ -27,7 +27,7 @@ public class DetailActivity extends AppCompatActivity {
             arguments.putInt(Utils.MOVIE_KEY,position);
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, fragment)
+                    .add(R.id.movie_detail_container, fragment)
                     .commit();
         }
     }
