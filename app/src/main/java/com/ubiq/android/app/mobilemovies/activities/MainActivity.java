@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
       //  setContentView(R.layout.fragment_main);
-        if (findViewById(R.id.container) != null) {
+        if (findViewById(R.id.movie_detail_container) != null) {
             // The detail container view will be present only in the large-screen layouts
             // (res/layout-sw600dp). If this view is present, then the activity should be
             // in two-pane mode.
@@ -38,13 +39,14 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
                 FragmentManager     fragmentManager     = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 DetailActivityFragment fragment = new DetailActivityFragment();
-                fragmentTransaction.add(R.id.container, fragment, DETAIL_FRAGMENT_TAG);
+                fragmentTransaction.add(R.id.movie_detail_container, fragment, DETAIL_FRAGMENT_TAG);
                 fragmentTransaction.hide(fragment);
                 fragmentTransaction.commit();
             }
         } else {
             mTwoPane = false;
-            getSupportActionBar ().setElevation(0f);
+            ActionBar actionBar = getSupportActionBar ();
+            if (actionBar != null) actionBar.setElevation(0f);
         }
         Log.v(LOG_TAG, "***mTwoPane=" + mTwoPane);
     }
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
 
-            Fragment oldFragment = fm.findFragmentById(R.id.container);
+            Fragment oldFragment = fm.findFragmentById(R.id.movie_detail_container);
             if (oldFragment != null) ft.remove(oldFragment);
 
             Bundle arguments = new Bundle();
@@ -91,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
             Fragment newFragment = new DetailActivityFragment();
             newFragment.setArguments(arguments);
 
-            ft.add(R.id.container, newFragment, DETAIL_FRAGMENT_TAG);
+            ft.add(R.id.movie_detail_container, newFragment, DETAIL_FRAGMENT_TAG);
             ft.show(newFragment);
             ft.commit();
         } else {
