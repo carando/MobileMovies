@@ -17,10 +17,11 @@
         android:layout_height="wrap_content"
         android:background="@color/purple500"
         android:elegantTextHeight="false"
-        android:gravity="left|center_vertical"
+        android:gravity="start|center_vertical"
         android:text="@string/movie_title"
         android:textSize="30sp"
         android:textColor="@color/white"
+        android:paddingStart="0dip"
         android:paddingLeft="15dip"
         android:typeface="sans"/>
 
@@ -35,6 +36,7 @@
             android:layout_width="200dip"
             android:layout_height="225dip"
             android:scaleType="centerInside"
+            android:contentDescription="@string/movie_description"
             android:layout_gravity="top"
             android:layout_marginTop="5dip"
             android:layout_marginRight="10dip"
@@ -59,7 +61,7 @@
                 android:text="@string/movie_release_year"
                 android:layout_marginBottom="5dip"
                 android:layout_marginLeft="10dip"
-                android:textSize="20dip"
+                android:textSize="20sp"
                 android:textColor="@color/gray"/>
 
             <TextView
@@ -69,7 +71,7 @@
                 android:text="@string/movie_running_time"
                 android:layout_marginBottom="5dip"
                 android:layout_marginLeft="10dip"
-                android:textSize="15dip"
+                android:textSize="15sp"
                 android:textStyle="italic"
                 android:textColor="@color/gray"/>
 
@@ -107,7 +109,7 @@
         android:elegantTextHeight="false"/>
 
     !--
-    !--  Trailers or Reviews
+    !--  Trailers
     !--
     !-- horizontal line
     <View
@@ -115,21 +117,16 @@
         android:layout_height="1dip"
         android:background="@color/black" />
 
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:showText="true"
-        android:textOn="Reviews"
-        android:textOff="Trailers"
-        android:id="@+id/trailer_or_review_switch"
-        android:layout_gravity="left|center_horizontal"
-        android:textColor="@color/black"/>
 
-    <fragment
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:name="android.support.v4.app.ListFragment"
-        android:id="@+id/container_trailer_or_reviews"
-        tools:layout="@layout/fragment_movie_reviews"/>
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:paddingLeft="5dip"
+              android:textStyle="bold"
+              android:paddingTop="5dip"/>
+
+    <ListView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:id="@+id/listview_trailers"/>
+
 
 </LinearLayout>
