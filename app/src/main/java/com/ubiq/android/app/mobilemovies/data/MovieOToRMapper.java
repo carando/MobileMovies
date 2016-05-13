@@ -10,6 +10,8 @@ import com.ubiq.android.app.mobilemovies.utils.Utils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by T on 3/28/2016.
@@ -32,6 +34,45 @@ public class MovieOToRMapper {
         }
         return mMovieOToRMapper;
     }
+    public List<Movie> getAllFavorites () {
+        ArrayList <Movie> favoriteMovies = null;
+        Log.v(LOG_TAG, "***entered getAllFavorites");
+        String rawQueryString = "SELECT " + MovieContract.MovieEntry.COLUMN_MOVIE_ID           + "," +
+                                            MovieContract.MovieEntry.COLUMN_MOVIE_TITLE        + "," +
+                                            MovieContract.MovieEntry.COLUMN_MOVIE_DESCRIPTION  + "," +
+                                            MovieContract.MovieEntry.COLUMN_MOVIE_RATING       + "," +
+                                            MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_YEAR + "," +
+                                            MovieContract.MovieEntry.COLUMN_MOVIE_RUNNING_TIME + "," +
+                                            MovieContract.MovieEntry.COLUMN_POSTER_IMAGE       + "," +
+                                            MovieContract.MovieEntry.COLUMN_POSTER_PATH        +
+                " FROM  " + MovieContract.MovieEntry.TABLE_NAME ;
+        Log.v (LOG_TAG, "query: " + rawQueryString);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor =  db.rawQuery(rawQueryString, null);
+
+        boolean rowsToRead = cursor.moveToFirst();
+        if (rowsToRead) {
+            favoriteMovies = new ArrayList<Movie>();
+            Log.v (LOG_TAG, "***Movie titles in Favorites");
+        }
+
+        while (rowsToRead) {
+            int    id          = cursor.getInt    (0);
+            String title       = cursor.getString (1);
+            String description = cursor.getString (2);
+            String rating      = cursor.getString (3);
+            String year        = cursor.getString (4);
+            String runningTime = cursor.getString (5);
+            byte[] image       = cursor.getBlob   (6);
+            String path        = cursor.getString (7);
+            Log.d (LOG_TAG, "*** movie title: " + title);
+            Movie movie = new Movie (id,title,rating,year,description,null,path);
+            favoriteMovies.add(movie);
+            rowsToRead = cursor.moveToNext();
+        }
+
+        return favoriteMovies;
+    }
 
     public long insertMovie(Movie aMovie) {
         Log.v(LOG_TAG, "***insert movie " + aMovie.toString());
@@ -49,6 +90,8 @@ public class MovieOToRMapper {
         long result = db.insert (MovieContract.MovieEntry.TABLE_NAME, null, values);
         return result;
     }
+
+
 
     private boolean movieInFavorites(Movie aMovie) {
         Log.v (LOG_TAG, "***movieInFavorites");
