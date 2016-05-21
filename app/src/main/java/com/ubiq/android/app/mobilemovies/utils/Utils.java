@@ -1,7 +1,10 @@
 package com.ubiq.android.app.mobilemovies.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -18,6 +21,8 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -34,6 +39,10 @@ public class Utils {
 
 
     private static String TAG = Utils.class.getSimpleName();
+
+    // TODO add documentation
+    private static String INTERNAL_FILE_DIRECTORY = "popularmovies";
+    private static File   ROOT_DIRECTORY          = null;
 
     // End point URI's for fetching movies and posters;
     private static final String URI_MOVIE_BASE        = "https://api.themoviedb.org/3/discover/movie?";
@@ -114,13 +123,6 @@ public class Utils {
     private Utils() {
     }
 
-    // Disconnect from the URL quietly; we don't care about null or exceptions
-    public static void closeQuietly(HttpURLConnection urlConnection) {
-        if (urlConnection != null) {
-            urlConnection.disconnect();
-        }
-    }
-
     // Close the reader stream quietly; we don't care about null or exceptions
     public static void closeQuietly(Reader reader) {
         if (reader != null) {
@@ -177,6 +179,42 @@ public class Utils {
         return url;
     }
 
+    // Disconnect from the URL quietly; we don't care about null or exceptions
+    public static void closeQuietly(HttpURLConnection urlConnection) {
+        if (urlConnection != null) {
+            urlConnection.disconnect();
+        }
+    }
+
+    // Close the reader stream quietly; we don't care about null or exceptions
+    public static void closeQuietly(FileOutputStream stream) {
+        if (stream != null) {
+            try {
+                stream.close();
+            }
+            catch (final IOException e) {
+                Log.e("Utils.closeQuietly", "Error closing stream", e);
+            }
+        }
+    }
+
+    // TODO Add documentation
+    public static Bitmap convertByteArrayToBitmap (byte [] byteArray) {
+        return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+    }
+
+    //TODO Add documentation
+    public static String createBitmapFileName () {
+        final String fileNamePrefix = "favmovie";
+        final String fileTypeSuffix = ".bmp";
+        int suffix = (int) (Math.random() * 10000);
+        StringBuffer buffer = new StringBuffer(fileNamePrefix)
+                .append(suffix)
+                .append(fileTypeSuffix);
+        return buffer.toString();
+    }
+
+    // TODO Add documentation
     public static byte [] downloadMovieImage (URL movieImageURL) {
         Log.v ("Utils", "*** downloadMovieImage");
         byte [] result = null;
@@ -184,8 +222,8 @@ public class Utils {
             InputStream in = new BufferedInputStream(movieImageURL.openStream());
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
-            int n = 0;
-            while (-1!=(n=in.read(buffer))) {
+            int n;
+            while (-1 !=(n=in.read(buffer))) {
                 out.write(buffer, 0, n);
             }
             out.close();
@@ -219,6 +257,15 @@ public class Utils {
         return url;
     }
 
+    // TODO: Add documentation
+    public static void initFileDirectory (Context context) {
+        if (ROOT_DIRECTORY == null) {
+            ROOT_DIRECTORY = new File(context.getFilesDir(), INTERNAL_FILE_DIRECTORY);
+            boolean success = ROOT_DIRECTORY.mkdirs();
+        }
+    }
+
+
     /**
      * Extracts the movie information from the JSON String we downloaded.
      * @param moviesJsonString JSON formatted string of movie information
@@ -236,7 +283,8 @@ public class Utils {
         final String OVERVIEW              = "overview";
         final String BACKDROP_PATH         = "backdrop_path";
         final String POSTER_PATH           = "poster_path";
-        final String IMDB_ID               = "imdb_id";
+        // TODO remove IMDB_ID
+      //  final String IMDB_ID               = "imdb_id";
 
         JSONObject moviesJson              = new JSONObject(moviesJsonString);
         JSONArray  moviesArray             = moviesJson.getJSONArray(RESULTS);
@@ -334,10 +382,25 @@ public class Utils {
      * @return URL of a poster that says "No Image"
      */
     public static String missingPoster () {
-        final String URL = "http://comicbookmoviedatabase.com/wp-content/uploads/2014/04/no-poster-available-336x500.jpg";
-        return URL;
+        return "http://comicbookmoviedatabase.com/wp-content/uploads/2014/04/no-poster-available-336x500.jpg";
     }
 
+    //TODO add documentation
+    public static String saveBitmapToFile(Bitmap bitmap, String fileName) {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(new File(ROOT_DIRECTORY, fileName));
+            // PNG is a lossless format, the compression factor (100) is ignored
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bitmap is your Bitmap instance
+            return ROOT_DIRECTORY + "/" + fileName;
+        } catch (Exception e) {
+            Log.e (TAG, "***exception " + e.toString());
+            e.printStackTrace();
+        } finally {
+            closeQuietly(out);
+        }
+        return null;
+    }
 
     /**
      * When the user sets the sort order through the "Settings" facility, return the
@@ -370,15 +433,6 @@ public class Utils {
      * @return the API Key
      */
     protected static String getAPIMovieKey() {
-        final String NO_API_KEY_MSG  = "You do not have a themoviedb.org API KEY loaded. " +
-                " Please go to https://www.themoviedb.org/account/signup to find out more about" +
-                " the needed key";
-        if (API_MOVIE_KEY == null) {
-            Toast toast = Toast.makeText (null, NO_API_KEY_MSG, Toast.LENGTH_LONG);
-            toast.show();
-            Log.e(TAG, NO_API_KEY_MSG);
-            return null;
-        }
         return API_MOVIE_KEY;
     }
 
