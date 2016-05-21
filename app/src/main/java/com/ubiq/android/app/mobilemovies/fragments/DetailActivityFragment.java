@@ -1,29 +1,23 @@
 package com.ubiq.android.app.mobilemovies.fragments;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
-
 import com.ubiq.android.app.mobilemovies.R;
+import com.ubiq.android.app.mobilemovies.activities.MovieReviewsActivity;
 import com.ubiq.android.app.mobilemovies.data.MovieDBHelper;
 import com.ubiq.android.app.mobilemovies.data.MovieOToRMapper;
 import com.ubiq.android.app.mobilemovies.model.Movie;
@@ -32,43 +26,38 @@ import com.ubiq.android.app.mobilemovies.model.MovieTrailer;
 import com.ubiq.android.app.mobilemovies.model.PopularMovies;
 import com.ubiq.android.app.mobilemovies.utils.FetchMovieDetailTask;
 import com.ubiq.android.app.mobilemovies.utils.MovieReviewsAdapter;
+import com.ubiq.android.app.mobilemovies.utils.MovieTrailerAdapter;
 import com.ubiq.android.app.mobilemovies.utils.Utils;
 import com.ubiq.android.app.mobilemovies.widget.ExpandableTextView;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The fragment that displays the detailed movie view
  */
 public class DetailActivityFragment extends Fragment {
     private final String LOG_TAG              = DetailActivityFragment.class.getSimpleName();
-    private final String TRAILER_FRAGMENT_TAG = "TF";
-    private final String REVIEW_FRAMENT_TAG   = "RF";
+
 
     private Movie mMovie;
     private int                        mMoviePosition = ListView.INVALID_POSITION;
     private ArrayAdapter<MovieTrailer> mMovieTrailerAdapter = null;
     private ArrayAdapter<MovieReview>  mMovieReviewAdapter  = null;
 
-    private ListView      mTrailerView   = null;
-    //   private ListView      mReviewView    = null;
-    private MovieDBHelper mMovieDBHelper = null;
 
-    private TextView           mMovieTitleLargeTextView;
-    private TextView           mMovieYearTextView;
-    private TextView           mRunningTimeTextView;
-    private TextView           mMovieRatingTextView;
-    private ExpandableTextView mMovieDescriptionTextView;
-    private ImageView          mMoviePosterImageView;
-    private Button             mFavoriteButton;
+    private MovieDBHelper      mMovieDBHelper = null;
 
-    private Switch mSwitch;
-
-//    private TextView  mMovieTrailersTextView;
-//    private TextView  mMovieReviewsTextView;
+    private TextView             mMovieTitleLargeTextView;
+    private TextView             mMovieYearTextView;
+    private TextView             mRunningTimeTextView;
+    private TextView             mMovieRatingTextView;
+    private ExpandableTextView   mMovieDescriptionTextView;
+    private ImageView            mMoviePosterImageView;
+    private Button               mFavoriteButton;
+    private ListView             mTrailerView;
+    private FloatingActionButton mReviewsButton;
 
     private boolean viewsInitialized = false;
 
@@ -80,14 +69,15 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        View rootView = null;
         try {
-            View rootView = inflater.inflate(R.layout.movie_detail, container, false);
+            rootView = inflater.inflate(R.layout.movie_detail_with_fab, container, false);
             initializeViews(rootView);
 
             Bundle arguments = getArguments();
             if (arguments != null) {
-
+                // The index of the movie in the PopularMovies singleton holder
+                // If not present, we will have problems
                 mMoviePosition = arguments.getInt(Utils.MOVIE_KEY);
                 // Log.v(LOG_TAG, "**onCreateView position = " + String.valueOf(moviePosition));
 
@@ -126,10 +116,9 @@ public class DetailActivityFragment extends Fragment {
                         final String movieTitle = mMovie.getTitle();
                         long result = addToFavorites(mMovie);
                        // Log.v(LOG_TAG, "***adding favorite result " + String.valueOf(result));
-                        String toastString = "Whoops! Nothing happened";
+                        String toastString;
                         if (result > 0) {
                             toastString = movieTitle + " Added to Favorites!";
-
                         }
                         else if (result == MovieOToRMapper.MOVIE_IN_FAVORITES) {
                             toastString = movieTitle + " Already in Favorites";
@@ -143,46 +132,43 @@ public class DetailActivityFragment extends Fragment {
                         toast.show();
                     }
                 });
+                // Reviews FloatingActionButton will display a message saying that you can go
+                // to reviews
+                mReviewsButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getContext(),"Displays Reviews",Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-                mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                      @Override
-                      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                          if(isChecked){
-                              Log.v(LOG_TAG, "Switch is currently ON");
-                              Fragment reviewsFragment = new MovieReviewsFragment();
-                              switchFragment(reviewsFragment, REVIEW_FRAMENT_TAG,TRAILER_FRAGMENT_TAG);
-                          }else{
-                              Log.v(LOG_TAG, "Switch is currently OFF");
-                              Fragment trailersFragment = new MovieTrailersFragment();
-                              switchFragment(trailersFragment, TRAILER_FRAGMENT_TAG,REVIEW_FRAMENT_TAG);
-
-                          }
-                       }
-                }
-                );
+                mReviewsButton.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        Intent intent = new Intent(getActivity(), MovieReviewsActivity.class);
+                        intent.putExtra (Utils.MOVIE_KEY, mMoviePosition);
+                        startActivity(intent);
+                        return true;
+                    }
+                });
 
                 //     bind mMovieTrailerAdapter with empty trailers for now
                 ArrayList < MovieTrailer > movieTrailers = new ArrayList<MovieTrailer>();
-    //          alternate implementation
-    //            mMovieTrailerAdapter   = new MovieTrailerAdapter(movieTrailers);
-                mMovieTrailerAdapter   = new
-                        com.ubiq.android.app.mobilemovies.utils.MovieTrailerAdapter(movieTrailers, getActivity());
-                //     bind mMovieTrailerAdapter with empty trailers for now
-                ArrayList<MovieReview> movieReviews = new ArrayList<MovieReview>();
-                mMovieReviewAdapter  = new MovieReviewsAdapter(movieReviews, getActivity());
-
-    //            Intent intent = getActivity().getIntent();
-    //            intent.putExtra (Utils.MOVIE_KEY, mMoviePosition);
+                mMovieTrailerAdapter   = new MovieTrailerAdapter(movieTrailers, getActivity());
+                mTrailerView.setAdapter(mMovieTrailerAdapter);
 
                 updateMovieDetail();
 
-                switchFragment (new MovieTrailersFragment(),TRAILER_FRAGMENT_TAG,REVIEW_FRAMENT_TAG);
+                if (mMovie.getNumberOfReviews() == 0) {
+                    mReviewsButton.hide();
+                } else mReviewsButton.show();
+
             }
             return rootView;
         } catch (Exception e) {
+            Log.e (LOG_TAG, "***ERROR: " + e.toString());
             e.printStackTrace();
         }
-        return null;
+        return rootView;
     }
 
     @Override
@@ -202,9 +188,7 @@ public class DetailActivityFragment extends Fragment {
     }
 
     private long addToFavorites(Movie movie) {
-        mMovieDBHelper = new MovieDBHelper(getContext());
-        mMovieDBHelper.getWritableDatabase();
-        MovieOToRMapper mapper = MovieOToRMapper.getInstance(mMovieDBHelper);
+        MovieOToRMapper mapper = MovieOToRMapper.getInstance(getContext());
         long result = mapper.insertMovie(movie);
         return result;
     }
@@ -219,7 +203,8 @@ public class DetailActivityFragment extends Fragment {
         mMovieDescriptionTextView = (ExpandableTextView) rootView.findViewById(R.id.movie_description);
         mMoviePosterImageView = (ImageView) rootView.findViewById(R.id.detailImage);
         mFavoriteButton = (Button) rootView.findViewById(R.id.button_favorite);
-        mSwitch  = (Switch)rootView.findViewById(R.id.trailer_or_review_switch);
+        mTrailerView = (ListView) rootView.findViewById(R.id.listview_trailers);
+        mReviewsButton = (FloatingActionButton)rootView.findViewById(R.id.reviews_button);
         viewsInitialized = true;
     }
 
@@ -233,127 +218,14 @@ public class DetailActivityFragment extends Fragment {
             FetchMovieDetailTask task = new FetchMovieDetailTask(getActivity());
             task.setMovie(mMovie);
             task.setMovieTrailerArrayAdapter(mMovieTrailerAdapter);
-            task.setMovieReviewArrayAdapter(mMovieReviewAdapter);
             task.execute();
         }
        mMovieTrailerAdapter.clear();
        mMovieTrailerAdapter.addAll(mMovie.getMovieTrailers());
-       mMovieReviewAdapter.clear();
-       mMovieReviewAdapter.addAll(mMovie.getMovieReviews());
     }
 
-    /**
-     * The array adapter that handles the display of the movie trailers
-     */
-    protected class MovieTrailerAdapter extends ArrayAdapter<MovieTrailer> {
-        private final String TAG = MovieTrailerAdapter.class.getSimpleName();
-
-        public MovieTrailerAdapter(ArrayList<MovieTrailer> trailers) {
-            super(getActivity(), android.R.layout.simple_list_item_1, trailers);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View       row = convertView;
-            ViewHolder holder;
-            //           Log.v(TAG, "mMovie = " + mMovie);
-           // Log.v(TAG, "position: " + String.valueOf(position));
-            List<MovieTrailer> trailers = mMovie.getMovieTrailers();
-           // Log.v(TAG, "***all trailers " + trailers);
-            MovieTrailer trailer = trailers.get(position);
-
-            ImageButton trailerButton;
-            // if no view was passed in, inflate one
-            if (null == row) {
-                row = getActivity().getLayoutInflater().
-                        inflate(R.layout.movie_trailer_layout, parent, false);
-                holder = new ViewHolder();
-                trailerButton = (ImageButton) row.findViewById(R.id.trailer_button);
-                holder.trailerButton = trailerButton;
-                holder.trailerName = (TextView) row.findViewById(R.id.trailer_name);
-                row.setTag(holder);
-            }
-            else {
-                holder = (ViewHolder) row.getTag();
-            }
-            //Load the trailer name and the image of the play button
-            holder.trailerName.setText(trailer.getName());
-           // Log.v(TAG, "holder.trailerName.text = " + holder.trailerName.getText());
-            holder.trailerButton.setImageResource(R.mipmap.ic_play);
-
-            // Set up the trailer button for activating trailer play
-            trailerButton = (ImageButton) row.findViewById(R.id.trailer_button);
-            trailerButton.setOnClickListener(new View.OnClickListener() {
-
-                // When the trailer button is clicked, this code will play the trailer
-                // as a Youtube video. We can't handle other trailer types just yet.
-                @Override
-                public void onClick(View v) {
-                    playTrailer(v);
-                }
-            });
-
-            return row;
-        }
-
-        /**
-         * ViewHolder is just a tuple for holding the trailer button and trailer name
-         */
-        protected class ViewHolder {
-            ImageButton trailerButton;
-            TextView    trailerName;
-        }
-
-        protected void playTrailer(View v) {
-            int          position = mTrailerView.getPositionForView(v);
-            MovieTrailer trailer  = mMovie.getMovieTrailers().get(position);
-            Toast toast = Toast.makeText(getActivity(),
-                                         "Play trailer [" + position + "] " + trailer.getName() +
-                                                 " for movie " + mMovie.getTitle(),
-                                         Toast.LENGTH_SHORT);
-            toast.show();
-            String youtubeId = trailer.getYoutubeSource();
-            Log.v(LOG_TAG,
-                  "Launching YouTube video for trailer " + Utils.YOU_TUBE_URL + youtubeId +
-                          " named " + trailer.getName());
-
-            try {
-                Intent intent = new Intent(Intent.ACTION_VIEW,
-                                           Uri.parse(Utils.YOU_TUBE_APP_INTENT + youtubeId));
-                startActivity(intent);
-            }
-            catch (ActivityNotFoundException ex) {
-                Log.v(LOG_TAG, ex.toString());
-                Log.v(LOG_TAG, Uri.parse(Utils.YOU_TUBE_URL + youtubeId).toString());
-                Intent intent = new Intent(Intent.ACTION_VIEW,
-                                           Uri.parse(Utils.YOU_TUBE_URL + youtubeId));
-                startActivity(intent);
-            }
-        }
-    }
 
     public MovieReviewsAdapter getMovieReviewAdapter() {
         return (MovieReviewsAdapter) mMovieReviewAdapter;
-    }
-
-    public ArrayAdapter<MovieTrailer> getMovieTrailerAdapter() {
-        return mMovieTrailerAdapter;
-    }
-
-    public ListView getTrailerView () {
-        return mTrailerView;
-    }
-
-    public void setTrailerView (ListView trailerView) {
-        mTrailerView = trailerView;
-    }
-
-    protected void switchFragment (Fragment newFragment, String newFragmentTag, String oldFragmentTag) {
-        FragmentManager fm = getChildFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
-        Fragment oldFragment = fm.findFragmentByTag(oldFragmentTag);
-        if (oldFragment != null) transaction.remove(oldFragment);
-        transaction.add(R.id.container_trailer_or_reviews, newFragment,newFragmentTag);
-        transaction.commit();
     }
 }
