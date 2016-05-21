@@ -28,10 +28,10 @@ public class FetchMovieDetailTask extends AsyncTask<Void, Void, Movie> {
     private final String LOG_TAG = FetchMovieDetailTask.class.getSimpleName();
 
     // The JSON string that will be populated by the RESTful call; initialized to null
-    private String movieJsonStr = null;
+    private String mMovieJsonStr = null;
     // The activity that invoked this AsyncTask; we need to save it to access a
     // view in the postExecute method
-    private Activity invokingActivity;
+    private Activity mInvokingActivity;
     // the movie whose details we are fetching
     private Movie    mMovie;
     /// the adapter for the movie trailers
@@ -46,7 +46,7 @@ public class FetchMovieDetailTask extends AsyncTask<Void, Void, Movie> {
      *                method to access a view
      */
     public FetchMovieDetailTask(Activity activity) {
-        invokingActivity = activity;
+        mInvokingActivity = activity;
     }
 
     public void setMovie(Movie movie) {
@@ -112,9 +112,9 @@ public class FetchMovieDetailTask extends AsyncTask<Void, Void, Movie> {
                 // Stream was empty.  No point in parsing.
                 return null;
             }
-            movieJsonStr = buffer.toString();
-            Log.v(LOG_TAG, "Movies JSON String " + movieJsonStr);
-            Utils.parseMovieDetailsFromJsonString(mMovie, movieJsonStr);
+            mMovieJsonStr = buffer.toString();
+            Log.v(LOG_TAG, "Movies JSON String " + mMovieJsonStr);
+            Utils.parseMovieDetailsFromJsonString(mMovie, mMovieJsonStr);
         }
         catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -137,14 +137,12 @@ public class FetchMovieDetailTask extends AsyncTask<Void, Void, Movie> {
         // to execute.
         final String LOG_TAG = "Fetch...PostExecute";
 
-        TextView runningTimeTextView = (TextView) invokingActivity.findViewById(
+        TextView runningTimeTextView = (TextView) mInvokingActivity.findViewById(
                 R.id.runningtime);
         runningTimeTextView.setText(mMovie.getRunningTime() + " mins");
         Log.v(LOG_TAG, mMovie.getMovieTrailers().toString());
         mMovieTrailerAdapter.clear();
         mMovieTrailerAdapter.addAll(mMovie.getMovieTrailers());
-//        mMovieReviewAdapter.clear();
-//        mMovieReviewAdapter.addAll(mMovie.getMovieReviews());
         mMovie.setMovieDetailLoaded(true);
     }
 }
