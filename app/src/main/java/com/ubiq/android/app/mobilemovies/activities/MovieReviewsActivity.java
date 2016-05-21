@@ -5,26 +5,43 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.ubiq.android.app.mobilemovies.R;
-import com.ubiq.android.app.mobilemovies.fragments.MovieReviewsFragment;
+import com.ubiq.android.app.mobilemovies.model.Movie;
+import com.ubiq.android.app.mobilemovies.model.MovieReview;
+import com.ubiq.android.app.mobilemovies.model.PopularMovies;
+import com.ubiq.android.app.mobilemovies.utils.MovieReviewsAdapter;
+import com.ubiq.android.app.mobilemovies.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MovieReviewsActivity extends AppCompatActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.movie_reviews_layout);
-        if (savedInstanceState == null) {
-            // Create the detail fragment and add it to the activity
-            // using a fragment transaction.
-            Fragment fragment = new MovieReviewsFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container_trailer_or_reviews, fragment)
-                    .commit();
-        }
-    }
+        setContentView(R.layout.movie_reviews_with_fab);
 
+        int moviePosition = getIntent().getIntExtra(Utils.MOVIE_KEY,0);
+
+        Movie movie = PopularMovies.getInstance().getMovie(moviePosition);
+        String movieTitle         = movie.getTitle();
+        List<MovieReview> reviews =  movie.getMovieReviews();
+
+        MovieReviewsAdapter movieReviewsAdapter   = new MovieReviewsAdapter(new ArrayList<MovieReview>(),
+                this);
+        TextView textView = (TextView)findViewById(R.id.reviews_title_textview);
+        textView.setText ("Reviews for " + movieTitle);
+        setTitle("Reviews for " + movieTitle);
+        ListView reviewView = (ListView)findViewById(R.id.reviews_list_view);
+        reviewView.setAdapter(movieReviewsAdapter);
+        movieReviewsAdapter.addAll(reviews);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
