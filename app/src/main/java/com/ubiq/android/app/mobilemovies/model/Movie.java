@@ -1,6 +1,11 @@
 package com.ubiq.android.app.mobilemovies.model;
 
 
+import android.content.Context;
+import android.graphics.Bitmap;
+
+import com.ubiq.android.app.mobilemovies.utils.Utils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,10 +21,11 @@ public class Movie {
     private String rating;
     private String releaseYear;
     private String overview;
-    private int numberOfReviews = 0;
-    private int runningTime     = 0;
+    private int    numberOfReviews = 0;
+    private int    runningTime     = 0;
     private String backdropPath;
     private String posterPath;
+    private String imageFile = null;
 
 
     private List<MovieReview>  movieReviews = null;
@@ -28,15 +34,16 @@ public class Movie {
 
     public Movie(int id, String title, String rating, String releaseYear, String overview,
                  String backdropPath, String posterPath) {
-        this.id = id;
-        this.title = title;
-        this.rating = rating;
-        this.overview = overview;
-        this.releaseYear = releaseYear;
+        this.id           = id;
+        this.title        = title;
+        this.rating       = rating;
+        this.overview     = overview;
+        this.releaseYear  = releaseYear;
         this.backdropPath = backdropPath;  // not used just yet
         this.posterPath   = posterPath;
 
-        movieDetailLoaded  = false;
+        movieDetailLoaded = false;
+        imageFile         = null;
     }
 
     /**
@@ -48,6 +55,10 @@ public class Movie {
 
     public int getId() {
         return id;
+    }
+
+    public String getImageFile () {
+        return imageFile;
     }
 
     /**
@@ -88,29 +99,13 @@ public class Movie {
 
 
 
-    @Override
-    public String toString() {
-        return "Movie{" +
-                "trailers=" + trailers +
-                ", backdropPath='" + backdropPath + '\'' +
-                ", id=" + id +
-                ", movieReviews=" + movieReviews +
-                ", overview='" + overview + '\'' +
-                ", posterPath='" + posterPath + '\'' +
-                ", movie_rating='" + rating + '\'' +
-                ", releaseYear='" + releaseYear + '\'' +
-                ", title='" + title + '\'' +
-                '}';
-    }
-
-
-
     public void addReview(MovieReview movieReview) {
         // performed for side-effect to initialize the movie reviews array
         getMovieReviews ();
         // add the review if it is not already present
         if (!movieReviews.contains(movieReview)) {
             movieReviews.add(movieReview);
+            numberOfReviews = movieReviews.size();
         }
     }
 
@@ -131,6 +126,8 @@ public class Movie {
         return movieReviews;
     }
 
+
+
     public List<MovieTrailer> getMovieTrailers() {
         final  int INITIAL_CAPACITY = 5;
         // return the movie trailers; if no trailers have been loaded
@@ -142,6 +139,7 @@ public class Movie {
         return trailers;
     }
 
+    // TODO add documentation
     public void setMovieDetailLoaded(boolean movieDetailLoaded) {
         this.movieDetailLoaded = movieDetailLoaded;
     }
@@ -150,9 +148,39 @@ public class Movie {
         this.numberOfReviews = numberOfReviews;
     }
 
+    public void setPosterImage(byte[] byteArray) {
+        if (imageFile != null) return;
+        Bitmap bitmap = Utils.convertByteArrayToBitmap(byteArray);
+        String baseFileName = Utils.createBitmapFileName();
+        Utils.saveBitmapToFile(bitmap, baseFileName);
+
+    }
+
     public void setRunningtime (int runtime) {
         this.runningTime = runtime;
     }
 
+
+
+
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "backdropPath='" + backdropPath + '\'' +
+                ", movieDetailLoaded=" + movieDetailLoaded +
+                ", id=" + id +
+                ", title='" + title + '\'' +
+                ", rating='" + rating + '\'' +
+                ", releaseYear='" + releaseYear + '\'' +
+                ", overview='" + overview + '\'' +
+                ", numberOfReviews=" + numberOfReviews +
+                ", runningTime=" + runningTime +
+                ", posterPath='" + posterPath + '\'' +
+                ", imageFile='" + imageFile + '\'' +
+                ", movieReviews=" + movieReviews +
+                ", trailers=" + trailers +
+                '}';
+    }
 }
 
