@@ -36,7 +36,7 @@ public class MovieReviewsAdapter extends ArrayAdapter<MovieReview> {
         MovieReview review = mReviews.get(position);
 
         TextView reviewerName;
-        ExpandableTextView reviewText;
+        TextView reviewText;
 
         // if no view was passed in, inflate one
         if (null == row) {
@@ -47,7 +47,7 @@ public class MovieReviewsAdapter extends ArrayAdapter<MovieReview> {
             reviewerName = (TextView) row.findViewById(R.id.reviewer_name);
             holder.reviewerName = reviewerName;
 
-            reviewText = (ExpandableTextView) row.findViewById(R.id.review_text);
+            reviewText = (TextView) row.findViewById(R.id.review_text);
             holder.reviewText = reviewText;
 
             row.setTag(holder);
@@ -66,6 +66,6 @@ public class MovieReviewsAdapter extends ArrayAdapter<MovieReview> {
      */
     protected class ViewHolder {
         TextView           reviewerName;
-        ExpandableTextView reviewText;
+        TextView reviewText;
     }
 }
