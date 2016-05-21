@@ -25,8 +25,11 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Prepare the internal directory for saving favorite movies
+        // This must be done prior to setting the content view
+        Utils.initFileDirectory(getApplicationContext());
         setContentView(R.layout.activity_main);
-      //  setContentView(R.layout.fragment_main);
+
         if (findViewById(R.id.movie_detail_container) != null) {
             // The detail container view will be present only in the large-screen layouts
             // (res/layout-sw600dp). If this view is present, then the activity should be
