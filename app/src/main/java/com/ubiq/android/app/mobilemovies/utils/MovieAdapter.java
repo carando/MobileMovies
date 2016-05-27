@@ -15,15 +15,22 @@ import com.ubiq.android.app.mobilemovies.model.Movie;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
- *  MovieAdapter holds the images of the movie posters that we've fetched from themoviedb.org
+ * MovieAdapter holds the images of the movie posters that we've fetched from themoviedb.org
  */
 public class MovieAdapter extends ArrayAdapter<Movie> {
     private final String TAG = MovieAdapter.class.getCanonicalName();
     private Movie mMovie;
     private FragmentActivity activity;
 
+    /**
+     * Instantiates a new Movie adapter.
+     *
+     * @param activity the invoking activity. Needed to inflate the layout
+     * @param movies   the movies we are "adapting"
+     */
     public MovieAdapter(FragmentActivity activity, ArrayList<Movie> movies) {
         super(activity, android.R.layout.simple_list_item_1, movies);
         this.activity = activity;
@@ -75,6 +82,7 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
         }
         return row;
     }
+
 
     protected class ViewHolder {
         ImageView imageView;
