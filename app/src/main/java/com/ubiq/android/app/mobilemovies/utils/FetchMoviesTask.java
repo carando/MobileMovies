@@ -123,6 +123,7 @@ public class FetchMoviesTask extends
         PopularMovies.getInstance().clear();
         PopularMovies.getInstance().addAll(movies);
         Log.v(LOG_TAG, PopularMovies.getInstance().getMovies().toString());
+        mMovieAdapter.clear();
         mMovieAdapter.addAll(movies);
 
     }
