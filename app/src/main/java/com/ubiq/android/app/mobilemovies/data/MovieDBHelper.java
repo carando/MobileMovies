@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
- * Created by T on 3/28/2016.
+ * Class to manage SQLite database
  */
 public class MovieDBHelper extends SQLiteOpenHelper {
     private static final String LOG_TAG = MovieDBHelper.class.getSimpleName();
@@ -23,6 +23,8 @@ public class MovieDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.v (LOG_TAG, "***onCreate");
         db.execSQL(MovieContract.MOVIE_ENTRY_CREATE_SQL);
+        db.execSQL(MovieContract.MOVIE_TRAILERS_ENTRY_CREATE_SQL);
+        db.execSQL(MovieContract.MOVIE_REVIEWS_ENTRY_CREATE_SQL);
     }
 
     @Override
