@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.ubiq.android.app.mobilemovies.R;
 import com.ubiq.android.app.mobilemovies.model.Movie;
@@ -40,8 +39,9 @@ public class Utils {
 
     private static String TAG = Utils.class.getSimpleName();
 
-    // TODO add documentation
+    // The location for storing favorited movies
     private static String INTERNAL_FILE_DIRECTORY = "popularmovies";
+    // The directory where the INTERNAL_FILE_DIRECTORY is rooted
     private static File   ROOT_DIRECTORY          = null;
 
     // End point URI's for fetching movies and posters;
@@ -198,23 +198,34 @@ public class Utils {
         }
     }
 
-    // TODO Add documentation
+
+    /**
+     * Converts the byte array of a movie poster into a bitmap
+     * @param byteArray the movie poster to be coverted to bitmap
+     * @return Bitmap returns the converted movie poster
+     */
     public static Bitmap convertByteArrayToBitmap (byte [] byteArray) {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
     }
 
-    //TODO Add documentation
+    /**
+     * Creates a random file name to be used to store a bitmap of a movie
+     * poster.
+     * @return a file name
+     */
     public static String createBitmapFileName () {
         final String fileNamePrefix = "favmovie";
         final String fileTypeSuffix = ".bmp";
         int suffix = (int) (Math.random() * 10000);
-        StringBuffer buffer = new StringBuffer(fileNamePrefix)
-                .append(suffix)
-                .append(fileTypeSuffix);
-        return buffer.toString();
+        return  fileNamePrefix + suffix + fileTypeSuffix;
     }
 
-    // TODO Add documentation
+    /**
+     * Downloads a movie poster image from the URL specified and converts
+     * the image to a byte array for storage.
+     * @param movieImageURL the URL where the image resides
+     * @return byte [] the byte array version of the image
+     */
     public static byte [] downloadMovieImage (URL movieImageURL) {
         Log.v ("Utils", "*** downloadMovieImage");
         byte [] result = null;
@@ -257,7 +268,12 @@ public class Utils {
         return url;
     }
 
-    // TODO: Add documentation
+    /**
+     * Initialize the local internal file directory.
+     *
+     * @param context the context
+     */
+
     public static void initFileDirectory (Context context) {
         if (ROOT_DIRECTORY == null) {
             ROOT_DIRECTORY = new File(context.getFilesDir(), INTERNAL_FILE_DIRECTORY);
@@ -306,8 +322,7 @@ public class Utils {
 
 
             // Create a new movie instance and add it to the movies to be returned
-            Movie movie = new Movie(id, title, rating, releaseYear, overview, backdropPath,
-                                    posterPath);
+            Movie movie = new Movie(id, title, rating, releaseYear, overview, posterPath);
             // Some of the movie data is really sparse; don't add bogus stuff
             if (!isBogus (movie)) movies.add(movie);
         }
@@ -387,19 +402,20 @@ public class Utils {
 
     //TODO add documentation
     public static String saveBitmapToFile(Bitmap bitmap, String fileName) {
-        FileOutputStream out = null;
+        String           bitmapFile = null;
+        FileOutputStream out        = null;
         try {
             out = new FileOutputStream(new File(ROOT_DIRECTORY, fileName));
             // PNG is a lossless format, the compression factor (100) is ignored
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bitmap is your Bitmap instance
-            return ROOT_DIRECTORY + "/" + fileName;
+            bitmapFile = ROOT_DIRECTORY + "/" + fileName;
         } catch (Exception e) {
             Log.e (TAG, "***exception " + e.toString());
             e.printStackTrace();
         } finally {
             closeQuietly(out);
         }
-        return null;
+        return bitmapFile;
     }
 
     /**
