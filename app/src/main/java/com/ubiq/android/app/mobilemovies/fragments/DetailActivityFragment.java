@@ -158,9 +158,16 @@ public class DetailActivityFragment extends Fragment {
 
                 updateMovieDetail();
 
+                // if there are no reviews, hide the reviews button
                 if (mMovie.getNumberOfReviews() == 0) {
                     mReviewsButton.hide();
                 } else mReviewsButton.show();
+
+                // if this movie has already been "favorited", hide the
+                // Mark as Favorite button
+                if (mMovie.getFavorite()) {
+                    mFavoriteButton.setVisibility(View.INVISIBLE);
+                } else mFavoriteButton.setVisibility(View.VISIBLE);
 
             }
             return rootView;
@@ -189,8 +196,7 @@ public class DetailActivityFragment extends Fragment {
 
     private long addToFavorites(Movie movie) {
         MovieOToRMapper mapper = MovieOToRMapper.getInstance(getContext());
-        long result = mapper.insertMovie(movie);
-        return result;
+        return mapper.insertMovie(movie);
     }
 
 
