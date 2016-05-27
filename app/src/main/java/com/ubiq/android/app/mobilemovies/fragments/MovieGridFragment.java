@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.ubiq.android.app.mobilemovies.R;
 import com.ubiq.android.app.mobilemovies.data.MovieOToRMapper;
@@ -197,10 +198,19 @@ public class MovieGridFragment extends Fragment implements AdapterView.OnItemCli
         // have added to favorites between now and last fetch
         if (sortOrder == Utils.SortOrder.FAVORITES) {
             MovieOToRMapper mapper = MovieOToRMapper.getInstance(getContext());
-            List<Movie> favorites = mapper.getAllFavorites();
+            ArrayList<Movie> favorites = (ArrayList)mapper.getAllFavorites();
+            if (null == favorites) {
+                Toast.makeText(getContext(),
+                        "You have no favorites",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
             movies.clear();
-            movies.addAll((ArrayList)favorites);
-            mMovieAdapter.addAll(movies.getMovies());
+            movies.addAll(favorites);
+            movies.setSortOrder(Utils.SortOrder.FAVORITES);
+
+            mMovieAdapter.clear();
+            mMovieAdapter.addAll(favorites);
             return;
         }
 
