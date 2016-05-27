@@ -24,7 +24,7 @@ public class PopularMovies {
     // the array list of movies
     private ArrayList<Movie> mMovies = null;
     // the sort order of the current set of movies
-    private Utils.SortOrder sortOrder;
+    private Utils.SortOrder currentSortOrder;
     // the new requested sort order specified by the user, if any
     private Utils.SortOrder requestedSortOrder;
 
@@ -34,8 +34,8 @@ public class PopularMovies {
     private PopularMovies() {
         final int INITIAL_CAPACITY = 40;
         mMovies = new ArrayList<Movie>(INITIAL_CAPACITY);
-        sortOrder = Utils.SortOrder.NOT_SPECIFIED;
-        requestedSortOrder = sortOrder;
+        currentSortOrder = Utils.SortOrder.NOT_SPECIFIED;
+        requestedSortOrder = currentSortOrder;
     }
 
     /**
@@ -51,11 +51,15 @@ public class PopularMovies {
     }
 
     public Utils.SortOrder getSortOrder() {
-        return sortOrder;
+        return currentSortOrder;
     }
 
     public void setSortOrder(Utils.SortOrder sortOrder) {
-        this.sortOrder = sortOrder;
+        this.currentSortOrder = sortOrder;
+    }
+
+    public void setRequestedSortOrder (Utils.SortOrder sortOrder) {
+        requestedSortOrder = sortOrder;
     }
 
     public ArrayList<Movie> getMovies() {
@@ -67,10 +71,11 @@ public class PopularMovies {
     }
 
 
-
     public void addAll (ArrayList <Movie> movies) {
         mMovies.addAll(movies);
     }
+
+
 
     // Clear the current movie collection and set the load date.
     // New movie data should be immediately loaded after the clear either by the
@@ -78,8 +83,7 @@ public class PopularMovies {
     public void clear(){
         mMovies.clear();
         loadDate = new GregorianCalendar();
-        setSortOrder(requestedSortOrder);
-        requestedSortOrder = getSortOrder();
+        setSortOrder(Utils.SortOrder.NOT_SPECIFIED);
     }
 
     // Determine if a call the RESTful interface is needed.
@@ -93,11 +97,11 @@ public class PopularMovies {
         if (PopularMovies.getInstance().getMovies().isEmpty()) return true;
 
         // Check if the newly specified sort order (sortOrderPref) is the same as that
-        // for the current collection (getSortOrder()). If the sort order is not the same,
+        // for the current collection (currentSortOrder). If the sort order is not the same,
         // we'll need to fetch new movies.
         // Save sortOrderPref here because when we reload the collection, we will have
         // used sortOrderPref to select the new batch of movies and we must remember it.
-        if (sortOrderPref != getSortOrder()) {
+        if (sortOrderPref != currentSortOrder) {
             requestedSortOrder = sortOrderPref;
             return true;
         }
