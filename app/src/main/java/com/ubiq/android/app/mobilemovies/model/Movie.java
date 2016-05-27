@@ -16,16 +16,16 @@ public class Movie {
 
     private boolean movieDetailLoaded;
 
-    private int    id;
-    private String title;
-    private String rating;
-    private String releaseYear;
-    private String overview;
-    private int    numberOfReviews = 0;
-    private int    runningTime     = 0;
-    private String backdropPath;
-    private String posterPath;
-    private String imageFile = null;
+    private int     id;
+    private String  title;
+    private String  rating;
+    private String  releaseYear;
+    private String  overview;
+    private int     numberOfReviews = 0;
+    private int     runningTime     = 0;
+    private String  posterPath;
+    private String  imageFile = null;
+    private boolean favorite = false;  // not stored in database
 
 
     private List<MovieReview>  movieReviews = null;
@@ -33,25 +33,19 @@ public class Movie {
 
 
     public Movie(int id, String title, String rating, String releaseYear, String overview,
-                 String backdropPath, String posterPath) {
+                 String posterPath) {
         this.id           = id;
         this.title        = title;
         this.rating       = rating;
         this.overview     = overview;
         this.releaseYear  = releaseYear;
-        this.backdropPath = backdropPath;  // not used just yet
         this.posterPath   = posterPath;
+        this.favorite     = false;
 
         movieDetailLoaded = false;
         imageFile         = null;
     }
 
-    /**
-    * Not sure if we need this....
-     */
-    public String getBackdropPath() {
-        return backdropPath;
-    }
 
     public int getId() {
         return id;
@@ -59,6 +53,10 @@ public class Movie {
 
     public String getImageFile () {
         return imageFile;
+    }
+
+    public boolean getFavorite () {
+        return favorite;
     }
 
     /**
@@ -139,7 +137,16 @@ public class Movie {
         return trailers;
     }
 
-    // TODO add documentation
+    public void setFavorite (boolean state) {
+        favorite = state;
+    }
+
+    /**
+     * Want to indicate that detail for the movie has been loaded so
+     * as to avoid re-accessing it. This will only be called to set
+     * the value to true
+     * @param movieDetailLoaded boolean indicating detail is loaded
+     */
     public void setMovieDetailLoaded(boolean movieDetailLoaded) {
         this.movieDetailLoaded = movieDetailLoaded;
     }
@@ -148,12 +155,16 @@ public class Movie {
         this.numberOfReviews = numberOfReviews;
     }
 
+    /**
+     * Stores the movie poster (the bytearray) as a bitmap into a
+     * file
+     * @param byteArray: the movie poster
+     */
     public void setPosterImage(byte[] byteArray) {
         if (imageFile != null) return;
         Bitmap bitmap = Utils.convertByteArrayToBitmap(byteArray);
-        String baseFileName = Utils.createBitmapFileName();
-        Utils.saveBitmapToFile(bitmap, baseFileName);
-
+        String baseFileName  = Utils.createBitmapFileName();
+        imageFile = Utils.saveBitmapToFile(bitmap, baseFileName);
     }
 
     public void setRunningtime (int runtime) {
@@ -167,7 +178,6 @@ public class Movie {
     @Override
     public String toString() {
         return "Movie{" +
-                "backdropPath='" + backdropPath + '\'' +
                 ", movieDetailLoaded=" + movieDetailLoaded +
                 ", id=" + id +
                 ", title='" + title + '\'' +
@@ -178,6 +188,7 @@ public class Movie {
                 ", runningTime=" + runningTime +
                 ", posterPath='" + posterPath + '\'' +
                 ", imageFile='" + imageFile + '\'' +
+                ", favorite ='" + favorite + '\'' +
                 ", movieReviews=" + movieReviews +
                 ", trailers=" + trailers +
                 '}';
