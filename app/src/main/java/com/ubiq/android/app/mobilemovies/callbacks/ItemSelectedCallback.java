@@ -5,6 +5,6 @@ package com.ubiq.android.app.mobilemovies.callbacks;
  * detailed viewing.
  */
 public interface ItemSelectedCallback {
-        void onItemSelected(int position);
+    void onItemSelected(int position);
 }
 
