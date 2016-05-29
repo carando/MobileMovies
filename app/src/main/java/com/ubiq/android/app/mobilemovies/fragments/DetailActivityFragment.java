@@ -56,6 +56,7 @@ public class DetailActivityFragment extends Fragment {
     private ExpandableTextView   mMovieDescriptionTextView;
     private ImageView            mMoviePosterImageView;
     private Button               mFavoriteButton;
+    private TextView             mTrailerHeader;
     private ListView             mTrailerView;
     private FloatingActionButton mReviewsButton;
 
@@ -157,18 +158,7 @@ public class DetailActivityFragment extends Fragment {
                 mTrailerView.setAdapter(mMovieTrailerAdapter);
 
                 updateMovieDetail();
-
-                // if there are no reviews, hide the reviews button
-                if (mMovie.getNumberOfReviews() == 0) {
-                    mReviewsButton.hide();
-                } else mReviewsButton.show();
-
-                // if this movie has already been "favorited", hide the
-                // Mark as Favorite button
-                if (mMovie.getFavorite()) {
-                    mFavoriteButton.setVisibility(View.INVISIBLE);
-                } else mFavoriteButton.setVisibility(View.VISIBLE);
-
+                showOrHide ();
             }
             return rootView;
         } catch (Exception e) {
@@ -194,6 +184,11 @@ public class DetailActivityFragment extends Fragment {
         }
     }
 
+    public MovieReviewsAdapter getMovieReviewAdapter() {
+        return (MovieReviewsAdapter) mMovieReviewAdapter;
+    }
+
+
     private long addToFavorites(Movie movie) {
         MovieOToRMapper mapper = MovieOToRMapper.getInstance(getContext());
         return mapper.insertMovie(movie);
@@ -209,15 +204,36 @@ public class DetailActivityFragment extends Fragment {
         mMovieDescriptionTextView = (ExpandableTextView) rootView.findViewById(R.id.movie_description);
         mMoviePosterImageView = (ImageView) rootView.findViewById(R.id.detailImage);
         mFavoriteButton = (Button) rootView.findViewById(R.id.button_favorite);
+        mTrailerHeader = (TextView)rootView.findViewById(R.id.trailer_heading);
         mTrailerView = (ListView) rootView.findViewById(R.id.listview_trailers);
         mReviewsButton = (FloatingActionButton)rootView.findViewById(R.id.reviews_button);
+
         viewsInitialized = true;
+    }
+
+    private void showOrHide () {
+
+        // if there are no reviews, hide the reviews button
+        mReviewsButton.setVisibility(View.VISIBLE);
+        if (mMovie.getNumberOfReviews() == 0) mReviewsButton.setVisibility(View.INVISIBLE);
+
+        // if this movie has already been "favorite-ed", hide the
+        // Mark as Favorite button
+        // Note that this needs to checked against the db
+        mFavoriteButton.setVisibility(View.VISIBLE);
+        if (mMovie.getFavorite() ||
+                MovieOToRMapper.getInstance(getContext()).movieInFavorites(mMovie)) {
+            mFavoriteButton.setVisibility(View.INVISIBLE);
+            mMovie.setFavorite(true);
+        }
+        mTrailerHeader.setText ("Trailers");
+        if (mMovie.getMovieTrailers().size() == 0) mTrailerHeader.setText ("No Trailers");
     }
 
     /**
      * Determines if movie data needs to be (re)loaded and if so, starts a thread
-     * to access the data. Clears the adapter and adds all the current movies stored
-     * into the adapter to update the view
+     * to access the data. Clears the trailer adapter and adds all the current trailers
+     * stored into the adapter to update the view
      */
     private void updateMovieDetail() {
         if (!mMovie.isMovieDetailLoaded()) {
@@ -231,7 +247,5 @@ public class DetailActivityFragment extends Fragment {
     }
 
 
-    public MovieReviewsAdapter getMovieReviewAdapter() {
-        return (MovieReviewsAdapter) mMovieReviewAdapter;
-    }
+
 }
