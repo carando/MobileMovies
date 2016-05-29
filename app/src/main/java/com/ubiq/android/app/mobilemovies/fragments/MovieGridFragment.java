@@ -26,6 +26,7 @@ import com.ubiq.android.app.mobilemovies.activities.SettingsActivity;
 import com.ubiq.android.app.mobilemovies.model.Movie;
 import com.ubiq.android.app.mobilemovies.callbacks.ItemSelectedCallback;
 import com.ubiq.android.app.mobilemovies.callbacks.ViewInvalidCallback;
+import com.ubiq.android.app.mobilemovies.utils.decorators.MovieTaskDecorator;
 
 import java.util.ArrayList;
 
@@ -229,9 +230,9 @@ public class MovieGridFragment extends Fragment implements AdapterView.OnItemCli
         Log.v(TAG, "updateMovies sortOrder " + sortOrder + " reloaded needed? " + reloadedNeeded);
 
         if (reloadedNeeded) {
-            FetchMoviesTask moviesTask = new FetchMoviesTask();
-            moviesTask.setInvokingActivity(getActivity());
-            moviesTask.setMovieAdapter(mMovieAdapter);
+            MovieTaskDecorator decorator = new MovieTaskDecorator(getActivity(),
+                    mMovieAdapter);
+            FetchMoviesTask moviesTask = new FetchMoviesTask(decorator);
             moviesTask.execute("");
 
         }
