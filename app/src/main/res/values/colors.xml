@@ -14,4 +14,8 @@
     <color name="purple400">#AB47BC</color>
     <color name="accent_green">#68EFAD</color>
     <color name="colorAccent">@color/accent_green</color>
+
+    <color name="dark_accent_color">#512DA8</color>
+    <color name="primary_color">#673AB7</color>
+    <color name="accent_color">#E040FB</color>
 </resources>
