@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -21,10 +20,11 @@ import com.ubiq.android.app.mobilemovies.activities.MovieReviewsActivity;
 import com.ubiq.android.app.mobilemovies.data.MovieDBHelper;
 import com.ubiq.android.app.mobilemovies.data.MovieOToRMapper;
 import com.ubiq.android.app.mobilemovies.model.Movie;
-import com.ubiq.android.app.mobilemovies.model.MovieReview;
 import com.ubiq.android.app.mobilemovies.model.MovieTrailer;
 import com.ubiq.android.app.mobilemovies.model.PopularMovies;
+import com.ubiq.android.app.mobilemovies.utils.decorators.Decorator;
 import com.ubiq.android.app.mobilemovies.utils.FetchMovieDetailTask;
+import com.ubiq.android.app.mobilemovies.utils.decorators.MovieDetailTaskDecorator;
 import com.ubiq.android.app.mobilemovies.utils.MovieReviewsAdapter;
 import com.ubiq.android.app.mobilemovies.utils.MovieTrailerAdapter;
 import com.ubiq.android.app.mobilemovies.utils.Utils;
@@ -43,8 +43,10 @@ public class DetailActivityFragment extends Fragment {
 
     private Movie mMovie;
     private int                        mMoviePosition = ListView.INVALID_POSITION;
-    private ArrayAdapter<MovieTrailer> mMovieTrailerAdapter = null;
-    private ArrayAdapter<MovieReview>  mMovieReviewAdapter  = null;
+//    private ArrayAdapter<MovieTrailer> mMovieTrailerAdapter = null;
+    private MovieTrailerAdapter mMovieTrailerAdapter = null;
+//    private ArrayAdapter<MovieReview>  mMovieReviewsAdapter  = null;
+    private MovieReviewsAdapter mMovieReviewsAdapter = null;
 
 
     private MovieDBHelper      mMovieDBHelper = null;
@@ -80,10 +82,8 @@ public class DetailActivityFragment extends Fragment {
                 // The index of the movie in the PopularMovies singleton holder
                 // If not present, we will have problems
                 mMoviePosition = arguments.getInt(Utils.MOVIE_KEY);
-                // Log.v(LOG_TAG, "**onCreateView position = " + String.valueOf(moviePosition));
 
-                mMovie = PopularMovies.getInstance().getMovie(mMoviePosition);
-                // Log.v(LOG_TAG, "movie[" + String.valueOf(moviePosition) + "] = " + mMovie.toString());
+                mMovie = PopularMovies.getInstance().getMovie(mMoviePosition);// Log.v(LOG_TAG, "movie[" + String.valueOf(moviePosition) + "] = " + mMovie.toString());
 
                 //** Initialize the detailed movie view
                 //    set the movie title banner
@@ -111,6 +111,7 @@ public class DetailActivityFragment extends Fragment {
                     Log.e(LOG_TAG, e.toString());
                 }
 
+                // TODO change appearance when clicked
                 //   create the favorite button
                 mFavoriteButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
@@ -185,7 +186,7 @@ public class DetailActivityFragment extends Fragment {
     }
 
     public MovieReviewsAdapter getMovieReviewAdapter() {
-        return (MovieReviewsAdapter) mMovieReviewAdapter;
+        return (MovieReviewsAdapter) mMovieReviewsAdapter;
     }
 
 
@@ -212,22 +213,19 @@ public class DetailActivityFragment extends Fragment {
     }
 
     private void showOrHide () {
+        MovieDetailTaskDecorator decorator = new MovieDetailTaskDecorator(getActivity(),
+                mMovie,mMovieTrailerAdapter);
 
-        // if there are no reviews, hide the reviews button
-        mReviewsButton.setVisibility(View.VISIBLE);
-        if (mMovie.getNumberOfReviews() == 0) mReviewsButton.setVisibility(View.INVISIBLE);
+        decorator.hideOrShowDetail();
 
-        // if this movie has already been "favorite-ed", hide the
-        // Mark as Favorite button
-        // Note that this needs to checked against the db
-        mFavoriteButton.setVisibility(View.VISIBLE);
-        if (mMovie.getFavorite() ||
-                MovieOToRMapper.getInstance(getContext()).movieInFavorites(mMovie)) {
+        // The decorator checks if the movie has been favorited, but only
+        // against an in-memory attribute. We check against the db for
+        // favorite status.
+
+        if (MovieOToRMapper.getInstance(getContext()).movieInFavorites(mMovie)) {
             mFavoriteButton.setVisibility(View.INVISIBLE);
             mMovie.setFavorite(true);
         }
-        mTrailerHeader.setText ("Trailers");
-        if (mMovie.getMovieTrailers().size() == 0) mTrailerHeader.setText ("No Trailers");
     }
 
     /**
@@ -237,9 +235,9 @@ public class DetailActivityFragment extends Fragment {
      */
     private void updateMovieDetail() {
         if (!mMovie.isMovieDetailLoaded()) {
-            FetchMovieDetailTask task = new FetchMovieDetailTask(getActivity());
-            task.setMovie(mMovie);
-            task.setMovieTrailerArrayAdapter(mMovieTrailerAdapter);
+            MovieDetailTaskDecorator decorator = new MovieDetailTaskDecorator(getActivity(),
+                    mMovie,mMovieTrailerAdapter);
+            FetchMovieDetailTask task = new FetchMovieDetailTask(decorator);
             task.execute();
         }
        mMovieTrailerAdapter.clear();
