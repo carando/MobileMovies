@@ -12,15 +12,20 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+
+import com.ubiq.android.app.mobilemovies.callbacks.ItemSelectedCallback;
 import com.ubiq.android.app.mobilemovies.fragments.DetailActivityFragment;
 import com.ubiq.android.app.mobilemovies.fragments.MovieGridFragment;
 import com.ubiq.android.app.mobilemovies.R;
 import com.ubiq.android.app.mobilemovies.utils.Utils;
+import com.ubiq.android.app.mobilemovies.callbacks.ViewInvalidCallback;
 
-public class MainActivity extends AppCompatActivity implements MovieGridFragment.Callback {
+public class MainActivity extends AppCompatActivity implements
+        ItemSelectedCallback, ViewInvalidCallback {
     private final static String LOG_TAG             = MainActivity.class.getSimpleName();
     private final        String DETAIL_FRAGMENT_TAG = "DF";
     private boolean             mTwoPane            = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +46,12 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
             if (savedInstanceState == null) {
                 FragmentManager     fragmentManager     = getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                DetailActivityFragment fragment = new DetailActivityFragment();
+                DetailActivityFragment fragment = (DetailActivityFragment)fragmentManager.
+                        findFragmentByTag(DETAIL_FRAGMENT_TAG);
+                if (null != fragment) {
+                    fragmentTransaction.remove(fragment);
+                }
+                fragment = new DetailActivityFragment();
                 fragmentTransaction.add(R.id.movie_detail_container, fragment, DETAIL_FRAGMENT_TAG);
                 fragmentTransaction.hide(fragment);
                 fragmentTransaction.commit();
@@ -89,7 +99,9 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
             FragmentTransaction ft = fm.beginTransaction();
 
             Fragment oldFragment = fm.findFragmentById(R.id.movie_detail_container);
-            if (oldFragment != null) ft.remove(oldFragment);
+            if (oldFragment != null) {
+                ft.remove(oldFragment);
+            }
 
             Bundle arguments = new Bundle();
             arguments.putInt(Utils.MOVIE_KEY, position);
@@ -106,4 +118,23 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
         }
         Log.v(LOG_TAG, "***mTwoPane=" + mTwoPane);
    }
+
+    @Override
+    public void onDetailViewInvalidated () {
+        if (mTwoPane) {
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+
+            Fragment oldFragment = fm.findFragmentById(R.id.movie_detail_container);
+            if (oldFragment != null) {
+                ft.remove(oldFragment);
+            }
+            ft.commit();
+        }
+    }
+
+
 }
