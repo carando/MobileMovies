@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.ubiq.android.app.mobilemovies.model.Movie;
 import com.ubiq.android.app.mobilemovies.model.PopularMovies;
+import com.ubiq.android.app.mobilemovies.utils.decorators.MovieTaskDecorator;
 
 import org.json.JSONException;
 
@@ -32,17 +33,15 @@ public class FetchMoviesTask extends
 
     private final String LOG_TAG = FetchMoviesTask.class.getCanonicalName();
 
-    private String           mMoviesJsonStr = null;
-    private MovieAdapter     mMovieAdapter  = null;
+    private String           mMoviesJsonStr    = null;
+    private MovieAdapter     mMovieAdapter     = null;
     private FragmentActivity mInvokingActivity = null;
 
-    public void setInvokingActivity (FragmentActivity activity) {
-        mInvokingActivity = activity;
+    public FetchMoviesTask (MovieTaskDecorator decorator) {
+        mInvokingActivity = decorator.getInvokingActivity();
+        mMovieAdapter     = decorator.getMovieAdapter();
     }
 
-    public void setMovieAdapter (MovieAdapter movieAdapter) {
-        mMovieAdapter = movieAdapter;
-    }
 
     @Override
     protected ArrayList<Movie> doInBackground(
