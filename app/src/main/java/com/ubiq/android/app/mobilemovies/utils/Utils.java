@@ -45,7 +45,8 @@ public class Utils {
     private static File   ROOT_DIRECTORY          = null;
 
     // End point URI's for fetching movies and posters;
-    private static final String URI_MOVIE_BASE        = "https://api.themoviedb.org/3/discover/movie?";
+ //   private static final String URI_MOVIE_BASE        = "https://api.themoviedb.org/3/discover/movie?";
+    private static final String URI_MOVIE_BASE        = "https://api.themoviedb.org/3/movie/";
     private static final String URI_IMAGE_BASE        = "http://image.tmdb.org/t/p/";
     private static final String URI_SINGLE_MOVIE_BASE = "http://api.themoviedb.org/3/movie/";
 
@@ -64,10 +65,12 @@ public class Utils {
     private static final String REVIEWS            = "reviews";
 
     // Argument indicating sort order for movies from themoviedb.org
-    // Default is popularity.desc
+    // Default is popularity.desc --> popular
 
-    public static final String MOST_POPULAR_PARAMETER   = "popularity.desc";   // most popular
-    public static final String HIGHEST_RATED_PARAMETER  = "vote_average.desc"; // highest rated
+//    public static final String MOST_POPULAR_PARAMETER   = "popularity.desc";   // most popular
+    public static final String MOST_POPULAR_PARAMETER   = "popular";   // most popular
+//    public static final String HIGHEST_RATED_PARAMETER  = "vote_average.desc"; // highest rated
+    public static final String HIGHEST_RATED_PARAMETER  = "top_rated"; // highest rated
     public static final String FAVORITES_RATED          = "user_favorites";    // locally stored
 
 
@@ -75,7 +78,7 @@ public class Utils {
      * Sort order indicates the set of movies requested for display;  they are either
      * the most popular movies from themoviedb.org (MOST_POPULAR), the highest rated
      * from themoviedb.org (HIGHEST_RATED)  or those that have been stored in the database
-     * as favorites (FAVORITES)-- not yet implemented.
+     * as favorites (FAVORITES)
      * NOT_SPECIFIED should only be set before any movies have been retrieved.
      */
     public enum SortOrder {
@@ -138,17 +141,17 @@ public class Utils {
     /**
      * Construct the URL for the themoviedb.org query
      *  Possible parameters are available at api.themoviedb.org
-     *  https://api.themoviedb.org/3/discover/movie?#####
+     *  https://api.themoviedb.org/3/movie/<sort order>?api_key=####
      * @param sortOrder the user-preferred sort order: MOST POPULAR, HIGHEST RATED,
-     *                  and eventually FAVORITES
+     *                  and FAVORITES
      * @return URL the URL to access the movies in the specified order
      * @throws MalformedURLException
      */
     public static URL buildMoviesURL (Utils.SortOrder sortOrder) throws MalformedURLException {
         String sortOrderURLParameter = sortOrder.getURLParameter();
         Uri uri = Uri.parse(URI_MOVIE_BASE).buildUpon().
+                appendPath(sortOrderURLParameter).
                 appendQueryParameter(API_KEY, Utils.getAPIMovieKey()).
-                appendQueryParameter(SORT_ORDER, sortOrderURLParameter).
                 build();
         URL url = new URL(uri.toString());
         Log.v(TAG, "Build Movie URL: " + url);
@@ -201,7 +204,7 @@ public class Utils {
 
     /**
      * Converts the byte array of a movie poster into a bitmap
-     * @param byteArray the movie poster to be coverted to bitmap
+     * @param byteArray the movie poster to be converted to bitmap
      * @return Bitmap returns the converted movie poster
      */
     public static Bitmap convertByteArrayToBitmap (byte [] byteArray) {
@@ -299,8 +302,7 @@ public class Utils {
         final String OVERVIEW              = "overview";
         final String BACKDROP_PATH         = "backdrop_path";
         final String POSTER_PATH           = "poster_path";
-        // TODO remove IMDB_ID
-      //  final String IMDB_ID               = "imdb_id";
+
 
         JSONObject moviesJson              = new JSONObject(moviesJsonString);
         JSONArray  moviesArray             = moviesJson.getJSONArray(RESULTS);
@@ -400,7 +402,12 @@ public class Utils {
         return "http://comicbookmoviedatabase.com/wp-content/uploads/2014/04/no-poster-available-336x500.jpg";
     }
 
-    //TODO add documentation
+    /**
+     * Writes a bitmpa to the indcated file
+     * @param bitmap the bitmap to be stored
+     * @param fileName the file name for the bitmap
+     * @return the full path of the file
+     */
     public static String saveBitmapToFile(Bitmap bitmap, String fileName) {
         String           bitmapFile = null;
         FileOutputStream out        = null;
