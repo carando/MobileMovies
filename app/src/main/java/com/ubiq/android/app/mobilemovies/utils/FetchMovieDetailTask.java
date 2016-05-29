@@ -2,7 +2,9 @@ package com.ubiq.android.app.mobilemovies.utils;
 
 import android.app.Activity;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -19,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 /**
  * The Asynchronous task that fetches the detailed movie information
@@ -137,12 +140,30 @@ public class FetchMovieDetailTask extends AsyncTask<Void, Void, Movie> {
         // to execute.
         final String LOG_TAG = "Fetch...PostExecute";
 
+        // Add the running time information from the movie detail to the
+        // detailed view
         TextView runningTimeTextView = (TextView) mInvokingActivity.findViewById(
                 R.id.runningtime);
         runningTimeTextView.setText(mMovie.getRunningTime() + " mins");
-        Log.v(LOG_TAG, mMovie.getMovieTrailers().toString());
+
+        // If there are trailers, load them into an adapter
+        // If there are no trailers, the header should display "No Trailers"
+
+        List<MovieTrailer> trailers = mMovie.getMovieTrailers();
+        Log.v(LOG_TAG, trailers.toString());
+        // clear and addall, whatever the number of trailers
         mMovieTrailerAdapter.clear();
-        mMovieTrailerAdapter.addAll(mMovie.getMovieTrailers());
+        mMovieTrailerAdapter.addAll(trailers);
+
+        TextView trailerHeader = (TextView)mInvokingActivity.findViewById(R.id.trailer_heading);
+        trailerHeader.setText ("Trailers");
+        if (mMovie.getMovieTrailers().size() == 0) trailerHeader.setText ("No Trailers");
+
+        FloatingActionButton reviewsButton =
+                (FloatingActionButton)mInvokingActivity.findViewById(R.id.reviews_button);
+        reviewsButton.setVisibility(View.VISIBLE);
+        if (mMovie.getMovieTrailers().size() == 0) reviewsButton.setVisibility(View.INVISIBLE);
+
         mMovie.setMovieDetailLoaded(true);
     }
 }
