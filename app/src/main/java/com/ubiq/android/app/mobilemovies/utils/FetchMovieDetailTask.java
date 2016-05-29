@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 import com.ubiq.android.app.mobilemovies.R;
 import com.ubiq.android.app.mobilemovies.model.Movie;
-import com.ubiq.android.app.mobilemovies.model.MovieReview;
 import com.ubiq.android.app.mobilemovies.model.MovieTrailer;
+import com.ubiq.android.app.mobilemovies.utils.decorators.MovieDetailTaskDecorator;
 
 import org.json.JSONException;
 
@@ -38,30 +38,23 @@ public class FetchMovieDetailTask extends AsyncTask<Void, Void, Movie> {
     // the movie whose details we are fetching
     private Movie    mMovie;
     /// the adapter for the movie trailers
-    private ArrayAdapter<MovieTrailer> mMovieTrailerAdapter = null;
-    // the adapter for the movie reviews
-    private ArrayAdapter<MovieReview>  mMovieReviewAdapter  = null;
+    private MovieTrailerAdapter mMovieTrailerAdapter = null;
+    // the decorator that provides data references and behavior for
+    // setting up the movie detail
+    private MovieDetailTaskDecorator mDecorator;
+
 
     /**
-     * Constructor for the class. Only here to accept and store the invoking
-     * activity
-     * @param activity: the activity that invoked this one. Needed in onPostExecute
-     *                method to access a view
+     * Instantiates a new Fetch movie detail task.
+     *
+     * @param decorator the decorator the provides data from the
+     *                  invoking activity or fragment
      */
-    public FetchMovieDetailTask(Activity activity) {
-        mInvokingActivity = activity;
-    }
-
-    public void setMovie(Movie movie) {
-        mMovie = movie;
-    }
-
-    public void setMovieTrailerArrayAdapter(ArrayAdapter<MovieTrailer> adapter) {
-        mMovieTrailerAdapter = adapter;
-    }
-
-    public void setMovieReviewArrayAdapter(ArrayAdapter<MovieReview> adapter) {
-        mMovieReviewAdapter = adapter;
+    public FetchMovieDetailTask (MovieDetailTaskDecorator decorator) {
+        mInvokingActivity    = decorator.getInvokingActivity();
+        mMovie               = decorator.getMovie();
+        mMovieTrailerAdapter = decorator.getTrailerAdapter();
+        mDecorator           = decorator;
     }
 
 
@@ -155,14 +148,9 @@ public class FetchMovieDetailTask extends AsyncTask<Void, Void, Movie> {
         mMovieTrailerAdapter.clear();
         mMovieTrailerAdapter.addAll(trailers);
 
-        TextView trailerHeader = (TextView)mInvokingActivity.findViewById(R.id.trailer_heading);
-        trailerHeader.setText ("Trailers");
-        if (mMovie.getMovieTrailers().size() == 0) trailerHeader.setText ("No Trailers");
-
-        FloatingActionButton reviewsButton =
-                (FloatingActionButton)mInvokingActivity.findViewById(R.id.reviews_button);
-        reviewsButton.setVisibility(View.VISIBLE);
-        if (mMovie.getMovieTrailers().size() == 0) reviewsButton.setVisibility(View.INVISIBLE);
+        // This code is needed in a couple of places; consolidated into the
+        // decorator
+        mDecorator.hideOrShowDetail();
 
         mMovie.setMovieDetailLoaded(true);
     }
