@@ -10,12 +10,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.ubiq.android.app.mobilemovies.R;
+import com.ubiq.android.app.mobilemovies.activities.MainActivity;
 import com.ubiq.android.app.mobilemovies.data.MovieOToRMapper;
 import com.ubiq.android.app.mobilemovies.model.PopularMovies;
 import com.ubiq.android.app.mobilemovies.utils.FetchMoviesTask;
@@ -24,9 +24,10 @@ import com.ubiq.android.app.mobilemovies.utils.Utils;
 import com.ubiq.android.app.mobilemovies.activities.DetailActivity;
 import com.ubiq.android.app.mobilemovies.activities.SettingsActivity;
 import com.ubiq.android.app.mobilemovies.model.Movie;
+import com.ubiq.android.app.mobilemovies.callbacks.ItemSelectedCallback;
+import com.ubiq.android.app.mobilemovies.callbacks.ViewInvalidCallback;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.ubiq.android.app.mobilemovies.model.PopularMovies.getInstance;
 
@@ -41,13 +42,12 @@ public class MovieGridFragment extends Fragment implements AdapterView.OnItemCli
     private static final String YOUR_FAVORITE_MOVIES_TITLE = "Your Favorite Movies";
 
     // The data adapter that will hold the movie poster images.
-    private MovieAdapter  mMovieAdapter = null;
-    private Callback      mCallback         = null;
-    private int           mPosition         = ListView.INVALID_POSITION;
+    private MovieAdapter          mMovieAdapter         = null;
+    private ItemSelectedCallback  mItemSelectedCallback = null;
+    private ViewInvalidCallback   mInvalidCallback      = null;
+    private int                   mPosition             = ListView.INVALID_POSITION;
 
-    public interface Callback {
-        void onItemSelected(int position);
-    }
+
 
     public MovieGridFragment() {
         Log.v (TAG, "constructor");
@@ -59,11 +59,18 @@ public class MovieGridFragment extends Fragment implements AdapterView.OnItemCli
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mCallback = (Callback) activity;
+            mItemSelectedCallback = (ItemSelectedCallback) activity;
         }
         catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                                                 + " must implement Callback");
+                                                 + " must implement ItemSelectedCallback");
+        }
+        try {
+            mInvalidCallback = (ViewInvalidCallback) activity;
+        }
+        catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement ViewInvalidCallback");
         }
     }
 
@@ -148,8 +155,12 @@ public class MovieGridFragment extends Fragment implements AdapterView.OnItemCli
         if (id == R.id.action_sort_order) {
             Log.v (TAG, "sort order option selected");
             setPrefSortOrder();
-            updateMovies();
-            return true;
+            // The sort order may have changed, invalidating any detail
+            // view shown, this code will remove that old fragment
+            Activity myActivity = getActivity();
+            if (myActivity instanceof MainActivity) {
+                ((ViewInvalidCallback) myActivity).onDetailViewInvalidated();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -169,7 +180,7 @@ public class MovieGridFragment extends Fragment implements AdapterView.OnItemCli
        mPosition = position;
        Intent intent = new Intent(getActivity(), DetailActivity.class);
        intent.putExtra(Utils.MOVIE_KEY, position);
-       ((Callback) getActivity()).onItemSelected(mPosition);
+       ((ItemSelectedCallback) getActivity()).onItemSelected(mPosition);
     }
 
     /**
