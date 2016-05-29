@@ -403,7 +403,7 @@ public class Utils {
     }
 
     /**
-     * Writes a bitmpa to the indcated file
+     * Writes a bitmap to the indicated file
      * @param bitmap the bitmap to be stored
      * @param fileName the file name for the bitmap
      * @return the full path of the file
@@ -493,7 +493,5 @@ public class Utils {
         return movie.getOverview().equalsIgnoreCase(NO_OVERVIEW);
 
     }
-
-
 }
 
