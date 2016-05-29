@@ -100,7 +100,6 @@ public class MovieTrailerAdapter extends ArrayAdapter<MovieTrailer> {
 
             }
         });
-
         return row;
     }
 
@@ -113,30 +112,6 @@ public class MovieTrailerAdapter extends ArrayAdapter<MovieTrailer> {
         TextView    trailerName;
     }
 
-//    protected void playTrailer(View v, MovieTrailer trailer) {
-//
-//        Toast toast = Toast.makeText(mActivity,
-//                                     trailer.getName(),
-//                                     Toast.LENGTH_SHORT);
-//        toast.show();
-//        String youtubeId = trailer.getYoutubeSource();
-//        Log.v(TAG,
-//              "Launching YouTube video for trailer " + Utils.YOU_TUBE_URL + youtubeId +
-//                      " named " + trailer.getName());
-//
-//        try {
-//            Intent intent = new Intent(Intent.ACTION_VIEW,
-//                                       Uri.parse(Utils.YOU_TUBE_APP_INTENT + youtubeId));
-//            mActivity.startActivity(intent);
-//        }
-//        catch (ActivityNotFoundException ex) {
-//            Log.v(TAG, ex.toString());
-//            Log.v(TAG, Uri.parse(Utils.YOU_TUBE_URL + youtubeId).toString());
-//            Intent intent = new Intent(Intent.ACTION_VIEW,
-//                                       Uri.parse(Utils.YOU_TUBE_URL + youtubeId));
-//            mActivity.startActivity(intent);
-//        }
- //   }
     protected MovieTrailer getMovieTrailer() {
         return mMovieTrailer;
     }
