@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:context="com.ubiq.android.app.mobilemovies.fragments.DetailActivityFragment">
+    tools:context="com.ubiq.android.app.mobilemovies.fragments.DetailActivityFragment"
+    >
 
 
     <TextView
@@ -80,14 +81,15 @@
                 android:layout_marginLeft="10dip"
                 android:textStyle="bold"/>
 
-            <Button
+            <ImageButton
                 style="?android:attr/buttonStyleSmall"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/movie_mark_as_favorite"
                 android:id="@+id/button_favorite"
-                android:background="@color/purple400"
-                android:textColor="@color/white"/>
+                android:src="@drawable/ic_star_black_24dp"
+                android:tint="@color/accent_color"
+                android:background="@color/white"/>
 
         </LinearLayout>
     </LinearLayout>
@@ -112,19 +114,18 @@
         android:layout_height="1dip"
         android:background="@color/black" />
 
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:showText="true"
-        android:textOn="Reviews"
-        android:textOff="Trailers"
-        android:id="@+id/trailer_or_review_switch"
-        android:layout_gravity="left|center_horizontal"
-        android:textColor="@color/black"/>
-    <fragment
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/container_trailer_or_reviews"
-        tools:layout="@layout/fragment_movie_reviews"/>
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:paddingLeft="5dip"
+              android:text="Trailers"
+              android:textStyle="bold"
+              android:paddingTop="5dip"
+              android:id="@+id/trailer_heading"/>
+
+    <ListView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:id="@+id/listview_trailers"/>
+
+
 
 </LinearLayout>
