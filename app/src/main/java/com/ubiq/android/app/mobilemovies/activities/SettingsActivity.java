@@ -1,6 +1,5 @@
 package com.ubiq.android.app.mobilemovies.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
