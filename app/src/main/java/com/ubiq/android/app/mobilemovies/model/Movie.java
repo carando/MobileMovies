@@ -1,7 +1,6 @@
 package com.ubiq.android.app.mobilemovies.model;
 
 
-import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.ubiq.android.app.mobilemovies.utils.Utils;
@@ -55,13 +54,13 @@ public class Movie {
         return imageFile;
     }
 
-    public boolean getFavorite () {
+    public boolean isFavorite() {
         return favorite;
     }
 
     /**
      *
-     * @return number of reviews recorded. Used next iteration
+     * @return number of reviews recorded.
      */
     public int getNumberOfReviews() {
         return numberOfReviews;
@@ -169,6 +168,10 @@ public class Movie {
 
     public void setRunningtime (int runtime) {
         this.runningTime = runtime;
+    }
+
+    public void setImageFile (String fileName) {
+        imageFile = fileName;
     }
 
 
