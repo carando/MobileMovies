@@ -12,6 +12,7 @@ import com.ubiq.android.app.mobilemovies.R;
 import com.ubiq.android.app.mobilemovies.fragments.MovieGridFragment;
 import com.ubiq.android.app.mobilemovies.model.Movie;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,10 +46,10 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final int  THUMB_NAIL_WIDTH  = 550;
-        final int  THUMB_NAIL_HEIGHT = 775;
+        final int THUMB_NAIL_WIDTH = 550;
+        final int THUMB_NAIL_HEIGHT = 775;
 
-        View       row = convertView;
+        View row = convertView;
         ViewHolder holder;
 
         // if no view was passed in, inflate one
@@ -58,33 +59,48 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
             holder = new ViewHolder();
             holder.imageView = (ImageView) row.findViewById(R.id.movie_poster_image);
             row.setTag(holder);
-        }
-        else {
+        } else {
             holder = (ViewHolder) row.getTag();
         }
         try {
             // Get the movie for this list position and load it via Picasso call
             Log.v(TAG, "movie position = " + String.valueOf(position));
-            mMovie      = getItem(position);
-            URL url     = Utils.buildMovieImageURL(mMovie.getPosterPath());
-            String moviePosterFile = mMovie.getImageFile();
-            String loadSource = url.toString();
-            if (moviePosterFile != null) loadSource = moviePosterFile;
+            mMovie = getItem(position);
 
-            //Load the image from the URL or the file into imageView using Picasso library routines
-            Picasso.with(getContext())
-                    .load(loadSource)
-                    .resize(THUMB_NAIL_WIDTH, THUMB_NAIL_HEIGHT)
-                    .into(holder.imageView);
-        }
-        catch (MalformedURLException e) {
-            Log.e(TAG, e.toString());
-        }
-        return row;
+            // check for a local file holder the poster bitmap
+            String moviePosterFile = mMovie.getImageFile();
+            if (isValidPosterFile (moviePosterFile) ){
+                File file = new File (moviePosterFile);
+                //Load the image from the URL or the file into imageView using Picasso library routines
+                Picasso.with(getContext())
+                        .load(file)
+                        .resize(THUMB_NAIL_WIDTH, THUMB_NAIL_HEIGHT)
+                        .error(R.drawable.play_it)
+                        .into(holder.imageView);
+            } else {
+                URL url = Utils.buildMovieImageURL(mMovie.getPosterPath());
+                Picasso.with(getContext())
+                        .load(url.toString())
+                        .resize(THUMB_NAIL_WIDTH, THUMB_NAIL_HEIGHT)
+                        .error(R.drawable.play_it)
+                        .into(holder.imageView);
+            }
+
+        } catch(MalformedURLException e){
+        Log.e(TAG, e.toString());
+    }
+    return row;
+
+}
+
+protected class ViewHolder {
+    ImageView imageView;
     }
 
-
-    protected class ViewHolder {
-        ImageView imageView;
+    private boolean isValidPosterFile (String moviePosterFile) {
+        if (moviePosterFile == null) return false;
+        File file = new File(moviePosterFile);
+        if (file.exists()) return true;
+        return false;
     }
 }
