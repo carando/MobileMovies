@@ -2,10 +2,7 @@ package com.ubiq.android.app.mobilemovies.utils;
 
 import android.app.Activity;
 import android.os.AsyncTask;
-import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
-import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.ubiq.android.app.mobilemovies.R;
@@ -76,7 +73,7 @@ public class FetchMovieDetailTask extends AsyncTask<Void, Void, Movie> {
         try {
             // Construct the URL for the themoviedb.org query
             // Possible parameters are available at api.themoviedb.org
-            // https://api.themoviedb.org/3/discover/movie?API#&popular
+            // https://api.themoviedb.org/3/movie?API#&popular
 
             URL url = Utils.buildMovieDetailURL(mMovie.getId());
             Log.v(LOG_TAG, "Build Movie Detail URL: " + url);
