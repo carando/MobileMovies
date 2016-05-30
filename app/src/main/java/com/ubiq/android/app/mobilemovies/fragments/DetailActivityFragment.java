@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,15 +17,12 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.ubiq.android.app.mobilemovies.R;
 import com.ubiq.android.app.mobilemovies.activities.MovieReviewsActivity;
-import com.ubiq.android.app.mobilemovies.data.MovieDBHelper;
 import com.ubiq.android.app.mobilemovies.data.MovieOToRMapper;
 import com.ubiq.android.app.mobilemovies.model.Movie;
 import com.ubiq.android.app.mobilemovies.model.MovieTrailer;
 import com.ubiq.android.app.mobilemovies.model.PopularMovies;
-import com.ubiq.android.app.mobilemovies.utils.decorators.Decorator;
 import com.ubiq.android.app.mobilemovies.utils.FetchMovieDetailTask;
 import com.ubiq.android.app.mobilemovies.utils.decorators.MovieDetailTaskDecorator;
-import com.ubiq.android.app.mobilemovies.utils.MovieReviewsAdapter;
 import com.ubiq.android.app.mobilemovies.utils.MovieTrailerAdapter;
 import com.ubiq.android.app.mobilemovies.utils.Utils;
 import com.ubiq.android.app.mobilemovies.widget.ExpandableTextView;
@@ -42,14 +39,8 @@ public class DetailActivityFragment extends Fragment {
 
 
     private Movie mMovie;
-    private int                        mMoviePosition = ListView.INVALID_POSITION;
-//    private ArrayAdapter<MovieTrailer> mMovieTrailerAdapter = null;
-    private MovieTrailerAdapter mMovieTrailerAdapter = null;
-//    private ArrayAdapter<MovieReview>  mMovieReviewsAdapter  = null;
-    private MovieReviewsAdapter mMovieReviewsAdapter = null;
-
-
-    private MovieDBHelper      mMovieDBHelper = null;
+    private int                  mMoviePosition       = ListView.INVALID_POSITION;
+    private MovieTrailerAdapter  mMovieTrailerAdapter = null;
 
     private TextView             mMovieTitleLargeTextView;
     private TextView             mMovieYearTextView;
@@ -57,8 +48,7 @@ public class DetailActivityFragment extends Fragment {
     private TextView             mMovieRatingTextView;
     private ExpandableTextView   mMovieDescriptionTextView;
     private ImageView            mMoviePosterImageView;
-    private Button               mFavoriteButton;
-    private TextView             mTrailerHeader;
+    private ImageButton          mFavoriteButton;
     private ListView             mTrailerView;
     private FloatingActionButton mReviewsButton;
 
@@ -82,9 +72,7 @@ public class DetailActivityFragment extends Fragment {
                 // The index of the movie in the PopularMovies singleton holder
                 // If not present, we will have problems
                 mMoviePosition = arguments.getInt(Utils.MOVIE_KEY);
-
-                mMovie = PopularMovies.getInstance().getMovie(mMoviePosition);// Log.v(LOG_TAG, "movie[" + String.valueOf(moviePosition) + "] = " + mMovie.toString());
-
+                mMovie = PopularMovies.getInstance().getMovie(mMoviePosition);
                 //** Initialize the detailed movie view
                 //    set the movie title banner
                 mMovieTitleLargeTextView.setText(mMovie.getTitle());
@@ -121,6 +109,7 @@ public class DetailActivityFragment extends Fragment {
                         String toastString;
                         if (result > 0) {
                             toastString = movieTitle + " Added to Favorites!";
+                            mFavoriteButton.setImageResource(R.drawable.ic_star_border_black_24dp);
                         }
                         else if (result == MovieOToRMapper.MOVIE_IN_FAVORITES) {
                             toastString = movieTitle + " Already in Favorites";
@@ -158,8 +147,8 @@ public class DetailActivityFragment extends Fragment {
                 mMovieTrailerAdapter   = new MovieTrailerAdapter(movieTrailers, getActivity());
                 mTrailerView.setAdapter(mMovieTrailerAdapter);
 
-                updateMovieDetail();
-                showOrHide ();
+                updateMovieDetail(rootView);
+                showOrHide (rootView);
             }
             return rootView;
         } catch (Exception e) {
@@ -185,11 +174,6 @@ public class DetailActivityFragment extends Fragment {
         }
     }
 
-    public MovieReviewsAdapter getMovieReviewAdapter() {
-        return (MovieReviewsAdapter) mMovieReviewsAdapter;
-    }
-
-
     private long addToFavorites(Movie movie) {
         MovieOToRMapper mapper = MovieOToRMapper.getInstance(getContext());
         return mapper.insertMovie(movie);
@@ -204,26 +188,25 @@ public class DetailActivityFragment extends Fragment {
         mMovieRatingTextView = (TextView) rootView.findViewById(R.id.rating);
         mMovieDescriptionTextView = (ExpandableTextView) rootView.findViewById(R.id.movie_description);
         mMoviePosterImageView = (ImageView) rootView.findViewById(R.id.detailImage);
-        mFavoriteButton = (Button) rootView.findViewById(R.id.button_favorite);
-        mTrailerHeader = (TextView)rootView.findViewById(R.id.trailer_heading);
+        mFavoriteButton =       (ImageButton) rootView.findViewById(R.id.button_favorite);
         mTrailerView = (ListView) rootView.findViewById(R.id.listview_trailers);
         mReviewsButton = (FloatingActionButton)rootView.findViewById(R.id.reviews_button);
 
         viewsInitialized = true;
     }
 
-    private void showOrHide () {
+    private void showOrHide (View rootView) {
         MovieDetailTaskDecorator decorator = new MovieDetailTaskDecorator(getActivity(),
-                mMovie,mMovieTrailerAdapter);
+                rootView, mMovie,mMovieTrailerAdapter);
 
         decorator.hideOrShowDetail();
 
-        // The decorator checks if the movie has been favorited, but only
+        // The decorator checks if the movie has been favorite-ed, but only
         // against an in-memory attribute. We check against the db for
         // favorite status.
 
         if (MovieOToRMapper.getInstance(getContext()).movieInFavorites(mMovie)) {
-            mFavoriteButton.setVisibility(View.INVISIBLE);
+            mFavoriteButton.setImageResource(R.drawable.ic_star_border_black_24dp);
             mMovie.setFavorite(true);
         }
     }
@@ -233,10 +216,10 @@ public class DetailActivityFragment extends Fragment {
      * to access the data. Clears the trailer adapter and adds all the current trailers
      * stored into the adapter to update the view
      */
-    private void updateMovieDetail() {
+    private void updateMovieDetail(View rootView) {
         if (!mMovie.isMovieDetailLoaded()) {
             MovieDetailTaskDecorator decorator = new MovieDetailTaskDecorator(getActivity(),
-                    mMovie,mMovieTrailerAdapter);
+                    rootView, mMovie,mMovieTrailerAdapter);
             FetchMovieDetailTask task = new FetchMovieDetailTask(decorator);
             task.execute();
         }
