@@ -3,31 +3,28 @@ package com.ubiq.android.app.mobilemovies.utils.decorators;
 import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.ubiq.android.app.mobilemovies.R;
-import com.ubiq.android.app.mobilemovies.data.MovieOToRMapper;
 import com.ubiq.android.app.mobilemovies.model.Movie;
-import com.ubiq.android.app.mobilemovies.model.MovieTrailer;
 import com.ubiq.android.app.mobilemovies.utils.MovieTrailerAdapter;
-import com.ubiq.android.app.mobilemovies.utils.decorators.Decorator;
 
 /**
- * Created by T on 5/29/2016.
+ * Decorator that passes critical references and handles show/hide evens
  */
 public class MovieDetailTaskDecorator implements Decorator {
 
-
     private Activity            mInvokingActivity;
+    private View                mView;
     private Movie               mMovie;
     private MovieTrailerAdapter mTrailerAdapter;
 
-    public MovieDetailTaskDecorator (Activity invokingActivity,
-                                     Movie movie,
-                                     MovieTrailerAdapter trailerAdapter) {
+    public MovieDetailTaskDecorator(Activity invokingActivity,
+                                    View view, Movie movie,
+                                    MovieTrailerAdapter trailerAdapter) {
         mInvokingActivity = invokingActivity;
+        mView             = view;
         mMovie            = movie;
         mTrailerAdapter   = trailerAdapter;
     }
@@ -46,13 +43,25 @@ public class MovieDetailTaskDecorator implements Decorator {
     }
 
     public void hideOrShowDetail () {
+        TextView             trailerHeader;
+        FloatingActionButton reviewsButton;
+        ImageButton           favoriteButton;
 
-        TextView trailerHeader = (TextView)mInvokingActivity.findViewById(R.id.trailer_heading);
+        if (null != mView) {
+            trailerHeader = (TextView)mView.findViewById(R.id.trailer_heading);
+            reviewsButton = (FloatingActionButton)mView.findViewById(R.id.reviews_button);
+            favoriteButton = (ImageButton)mView.findViewById(R.id.button_favorite);
+        } else {
+            trailerHeader = (TextView)mInvokingActivity.findViewById(R.id.trailer_heading);
+            reviewsButton =
+                    (FloatingActionButton)mInvokingActivity.findViewById(R.id.reviews_button);
+            favoriteButton = (ImageButton)mInvokingActivity.findViewById(R.id.button_favorite);
+        }
+
+
         trailerHeader.setText ("Trailers");
         if (mMovie.getMovieTrailers().size() == 0) trailerHeader.setText ("No Trailers");
 
-        FloatingActionButton reviewsButton =
-                (FloatingActionButton)mInvokingActivity.findViewById(R.id.reviews_button);
         reviewsButton.setVisibility(View.VISIBLE);
         if (mMovie.getMovieReviews().size() == 0) reviewsButton.setVisibility(View.INVISIBLE);
 
@@ -60,10 +69,14 @@ public class MovieDetailTaskDecorator implements Decorator {
         // Mark as Favorite button. This will also need to be checked
         // against the database, but we won't do that here
 
-        Button mFavoriteButton = (Button)mInvokingActivity.findViewById(R.id.button_favorite);
-        mFavoriteButton.setVisibility(View.VISIBLE);
-        if (mMovie.getFavorite()) {
-            mFavoriteButton.setVisibility(View.INVISIBLE);
+//        favoriteButton.setVisibility(View.VISIBLE);
+//        if (mMovie.isFavorite()) {
+//            favoriteButton.setVisibility(View.INVISIBLE);
+//        }
+
+ //       favoriteButton.setImageResource (R.drawable.ic_star_black_24dp);
+        if (mMovie.isFavorite()) {
+            favoriteButton.setImageResource(R.drawable.ic_star_border_black_24dp);
         }
     }
 }
