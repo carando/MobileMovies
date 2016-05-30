@@ -62,6 +62,7 @@ public class MovieOToRMapper {
           SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         favoriteMovies = getMovies(db);
+        if (null == favoriteMovies) return null;
         for (int i=0; i<favoriteMovies.size(); i++) {
             Movie aMovie = favoriteMovies.get(i);
             getTrailers(db, aMovie);
@@ -117,17 +118,6 @@ public class MovieOToRMapper {
         return insertResult;
       }
 
-    /**
-     * Insert movie into database if not there already.
-     *
-     * @param values the content values for the movie
-     * @return long location of movie in database
-     */
-    public long insertMovie (ContentValues values) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        return db.insert (MovieContract.MovieEntry.TABLE_NAME, null, values);
-    }
-
 
     /**
      * Returns true of the movie is already in the database
@@ -164,7 +154,6 @@ public class MovieOToRMapper {
         values.put (MovieContract.MovieEntry.COLUMN_MOVIE_RATING,       aMovie.getRating());
         values.put (MovieContract.MovieEntry.COLUMN_MOVIE_RUNNING_TIME, aMovie.getRunningTime());
         values.put (MovieContract.MovieEntry.COLUMN_POSTER_PATH,        aMovie.getPosterPath());
-        values.put (MovieContract.MovieEntry.COLUMN_POSTER_FILE,        aMovie.getImageFile());
 
         byte[] moviePoster;
         try {
@@ -266,6 +255,8 @@ public class MovieOToRMapper {
             String imageFile   = cursor.getString (7);
             Log.d (LOG_TAG, "*** movie title: " + title);
             Movie movie = new Movie (id,title,rating,year,description,path);
+            movie.setRunningtime(Integer.valueOf(runningTime));
+            movie.setImageFile(imageFile);
             movie.setFavorite(true);
             favoriteMovies.add(movie);
             rowsToRead  = cursor.moveToNext();
