@@ -15,7 +15,7 @@
         android:id="@+id/movie_title_large"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/purple500"
+        android:background="@color/dark_accent_color"
         android:elegantTextHeight="false"
         android:gravity="start|center_vertical"
         android:text="@string/movie_title"
@@ -85,14 +85,15 @@
                 android:layout_marginLeft="10dip"
                 android:textStyle="bold"/>
 
-            <Button
+            <ImageButton
                 style="?android:attr/buttonStyleSmall"
-                android:layout_width="100dip"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/movie_mark_as_favorite"
+                android:src="@drawable/ic_star_black_24dp"
                 android:id="@+id/button_favorite"
-                android:background="@color/purple400"
-                android:textColor="@color/white"/>
+                android:background="@color/white"
+                android:tint="@color/accent_color"/>
 
         </LinearLayout>
     </LinearLayout>
@@ -121,8 +122,10 @@
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:paddingLeft="5dip"
+              android:text="Trailers"
               android:textStyle="bold"
-              android:paddingTop="5dip"/>
+              android:paddingTop="5dip"
+              android:id="@+id/trailer_heading"/>
 
     <ListView android:layout_width="match_parent"
               android:layout_height="wrap_content"
