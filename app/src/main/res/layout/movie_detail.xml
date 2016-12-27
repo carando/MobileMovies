@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:context="com.ubiq.android.app.mobilemovies.fragments.DetailActivityFragment"
-    >
+    android:background="@color/black">
     !--
     !--  Basic Movie Information: Title, Poster, Release Date, Popularity
     !--    Running Time, Description
@@ -73,7 +73,8 @@
                 android:layout_marginLeft="10dip"
                 android:textSize="15sp"
                 android:textStyle="italic"
-                android:textColor="@color/gray"/>
+                android:textColor="@color/gray"
+                />
 
             <TextView
                 android:id="@+id/rating"
@@ -83,7 +84,8 @@
                 android:gravity="top|left"
                 android:layout_marginBottom="5dip"
                 android:layout_marginLeft="10dip"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:textColor="@color/gray"/>
 
             <ImageButton
                 style="?android:attr/buttonStyleSmall"
@@ -92,7 +94,7 @@
                 android:text="@string/movie_mark_as_favorite"
                 android:src="@drawable/ic_star_black_24dp"
                 android:id="@+id/button_favorite"
-                android:background="@color/white"
+                android:background="@color/black"
                 android:tint="@color/accent_color"/>
 
         </LinearLayout>
@@ -107,7 +109,8 @@
         android:layout_marginLeft="10dip"
         android:layout_marginRight="10dip"
         android:textStyle="normal"
-        android:elegantTextHeight="false"/>
+        android:elegantTextHeight="false"
+        android:textColor="@color/white"/>
 
     !--
     !--  Trailers
@@ -116,7 +119,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dip"
-        android:background="@color/black" />
+        android:background="@color/white" />
 
 
     <TextView android:layout_width="wrap_content"
@@ -125,7 +128,8 @@
               android:text="Trailers"
               android:textStyle="bold"
               android:paddingTop="5dip"
-              android:id="@+id/trailer_heading"/>
+              android:id="@+id/trailer_heading"
+              android:textColor="@color/white"/>
 
     <ListView android:layout_width="match_parent"
               android:layout_height="wrap_content"

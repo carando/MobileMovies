@@ -30,5 +30,6 @@
         android:padding="10dip"
         android:gravity="center_vertical"
         android:typeface="normal"
-        android:textSize="15dip"/>
+        android:textSize="15dip"
+        android:textColor="@color/white"/>
 </LinearLayout>

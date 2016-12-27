@@ -54,7 +54,7 @@ public class Utils {
     private static final String IMAGE_SIZE = "w185";
 
     // API Key for themoviedb.org request
-    private static final String API_MOVIE_KEY = "523c46ff603be26582c7dee52e4d3d29";
+    private static final String API_MOVIE_KEY = "";
      //private static final String API_MOVIE_KEY = null;
 
     // Arguments to themoviedb.org RESTful interfaces

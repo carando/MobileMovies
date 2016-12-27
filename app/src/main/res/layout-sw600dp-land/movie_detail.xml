@@ -6,14 +6,14 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:context="com.ubiq.android.app.mobilemovies.fragments.DetailActivityFragment"
-    >
+    android:background="@color/black">
 
 
     <TextView
         android:id="@+id/movie_title_large"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/purple500"
+        android:background="@color/dark_accent_color"
         android:elegantTextHeight="false"
         android:gravity="left|center_vertical"
         android:text="@string/movie_title"
@@ -79,7 +79,8 @@
                 android:gravity="top|left"
                 android:layout_marginBottom="5dip"
                 android:layout_marginLeft="10dip"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:textColor="@color/gray"/>
 
             <ImageButton
                 style="?android:attr/buttonStyleSmall"
@@ -89,7 +90,7 @@
                 android:id="@+id/button_favorite"
                 android:src="@drawable/ic_star_black_24dp"
                 android:tint="@color/accent_color"
-                android:background="@color/white"/>
+                android:background="@color/black"/>
 
         </LinearLayout>
     </LinearLayout>
@@ -103,7 +104,8 @@
         android:layout_marginLeft="10dip"
         android:layout_marginRight="10dip"
         android:textStyle="normal"
-        android:elegantTextHeight="false"/>
+        android:elegantTextHeight="false"
+        android:textColor="@color/white"/>
 
     !--
     !--  Trailers
@@ -112,7 +114,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dip"
-        android:background="@color/black" />
+        android:background="@color/dark_accent_color" />
 
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -120,7 +122,8 @@
               android:text="Trailers"
               android:textStyle="bold"
               android:paddingTop="5dip"
-              android:id="@+id/trailer_heading"/>
+              android:id="@+id/trailer_heading"
+              android:textColor="@color/white"/>
 
     <ListView android:layout_width="match_parent"
               android:layout_height="wrap_content"
